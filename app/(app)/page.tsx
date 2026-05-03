@@ -23,7 +23,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <PageHeader title="HomeHub" />
+      <PageHeader title="ホーム" />
 
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-lg border bg-card p-4">
