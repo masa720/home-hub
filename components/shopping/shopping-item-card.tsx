@@ -3,8 +3,8 @@ import { deleteShoppingItem, toggleShoppingItem } from "@/app/(app)/shopping/act
 import { ShoppingItemForm } from "@/components/shopping/shopping-item-form";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { storeColorMap } from "@/lib/db/shopping";
 import { cn } from "@/lib/utils/cn";
+import { storeColorMap } from "@/lib/utils/stores";
 import type { ShoppingItemWithStore } from "@/lib/db/shopping";
 import type { Store } from "@/types/database";
 

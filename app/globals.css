@@ -10,8 +10,8 @@
     --card-foreground: 222 47% 8%;
     --border: 214 32% 88%;
     --input: 214 32% 88%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 166 100% 8%;
+    --primary: 222 47% 18%;
+    --primary-foreground: 210 40% 98%;
     --accent: 199 89% 48%;
     --accent-foreground: 204 100% 97%;
     --destructive: 0 72% 51%;
@@ -27,8 +27,8 @@
     --card-foreground: 210 40% 98%;
     --border: 215 24% 18%;
     --input: 215 24% 18%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 166 100% 8%;
+    --primary: 199 89% 64%;
+    --primary-foreground: 222 47% 8%;
     --accent: 199 89% 48%;
     --accent-foreground: 204 100% 97%;
     --destructive: 0 72% 51%;
@@ -54,13 +54,13 @@
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans",
       "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
     background:
-      radial-gradient(circle at top left, rgba(20, 184, 166, 0.1), transparent 26rem),
+      radial-gradient(circle at top left, rgba(15, 23, 42, 0.1), transparent 26rem),
       hsl(var(--background));
   }
 
   html.dark body {
     background:
-      radial-gradient(circle at top left, rgba(20, 184, 166, 0.14), transparent 26rem),
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 26rem),
       hsl(var(--background));
   }
 

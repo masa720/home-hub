@@ -1,7 +1,7 @@
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { ShoppingAddFab } from "@/components/shopping/shopping-add-fab";
 import { ShoppingItemCard } from "@/components/shopping/shopping-item-card";
-import { ShoppingItemForm } from "@/components/shopping/shopping-item-form";
 import { StoreFilter } from "@/components/shopping/store-filter";
 import { getShoppingItems, getStores } from "@/lib/db/shopping";
 import { createClient } from "@/lib/supabase/server";
@@ -21,14 +21,14 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
   return (
     <>
       <PageHeader title="買い物リスト" />
-      <ShoppingItemForm stores={stores} />
+      <ShoppingAddFab stores={stores} />
       <StoreFilter stores={stores} currentStoreId={store} />
 
       <section className="space-y-3">
         {openItems.length > 0 ? (
           openItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)
         ) : (
-          <EmptyState title="未購入の商品はありません" description="必要なものを上のフォームから追加できます。" />
+          <EmptyState title="未購入の商品はありません" description="右下の追加ボタンから登録できます。" />
         )}
       </section>
 

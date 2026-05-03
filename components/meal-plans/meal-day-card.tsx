@@ -45,7 +45,7 @@ function MealSlot({
     <div className="rounded-lg border bg-slate-950/45 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-normal text-emerald-300">{labels[mealType]}</p>
+          <p className="text-xs font-semibold uppercase tracking-normal text-primary">{labels[mealType]}</p>
           <h3 className="mt-1 font-semibold text-white">{plan.title}</h3>
           {plan.recipe ? <p className="mt-1 text-sm text-muted-foreground">レシピ: {plan.recipe.title}</p> : null}
           {plan.note ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{plan.note}</p> : null}

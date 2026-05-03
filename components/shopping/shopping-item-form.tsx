@@ -5,17 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
-import { defaultStoreNames } from "@/lib/db/shopping";
 import type { ShoppingItemWithStore } from "@/lib/db/shopping";
+import { defaultStoreNames } from "@/lib/utils/stores";
 import type { Store } from "@/types/database";
 
 type ShoppingItemFormProps = {
   stores: Store[];
   item?: ShoppingItemWithStore;
   compact?: boolean;
+  showCancel?: boolean;
 };
 
-export function ShoppingItemForm({ stores, item, compact = false }: ShoppingItemFormProps) {
+export function ShoppingItemForm({ stores, item, compact = false, showCancel = false }: ShoppingItemFormProps) {
   const action = item ? updateShoppingItem : createShoppingItem;
   const datalistId = `store-options-${item?.id ?? "new"}`;
   const storeNames = [
@@ -53,7 +54,7 @@ export function ShoppingItemForm({ stores, item, compact = false }: ShoppingItem
       </div>
       {!compact ? <Textarea name="note" placeholder="メモ" defaultValue={item?.note ?? ""} /> : null}
       <div className="flex justify-end gap-2">
-        {item ? <CancelButton /> : null}
+        {item || showCancel ? <CancelButton /> : null}
         {item ? (
           <SubmitButton variant="secondary">更新</SubmitButton>
         ) : (

@@ -27,7 +27,7 @@ export default async function HomePage() {
 
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm font-semibold text-emerald-300">今日のランチ</p>
+          <p className="text-sm font-semibold text-primary">今日のランチ</p>
           <h2 className="mt-2 text-lg font-bold text-white">{lunch?.title ?? "未登録"}</h2>
           {lunch?.note ? <p className="mt-2 text-sm text-muted-foreground">{lunch.note}</p> : null}
         </div>
