@@ -1,6 +1,6 @@
 # HomeHub
 
-A household management web app for families. Phase 1 includes Supabase Auth, shared layout, shopping list, recipe stock, and meal planner. The household budget module has DB schema and RLS ready.
+A household management web app for families. Includes Supabase Auth, shared layout, shopping list, recipe stock, meal planner, and household budget.
 
 ## Tech Stack
 
@@ -58,21 +58,14 @@ Runs at `http://localhost:3000` by default.
 - Meal planner: weekly view, add, edit, delete, recipe linking
 - Recipes: add, edit, delete, cooked check, favorites, ingredient management
 - Add ingredients to shopping list from recipes/meal planner
+- Household budget: add, edit, delete, category management
 - Supabase Row Level Security
-
-## Roadmap
-
-- Phase 2: household budget UI
-- PWA icons and offline cache
-- Household sharing model
-- Recipe tags and category search
-- Shopping list sorting and store-grouped view
 
 ---
 
 # HomeHub
 
-家庭向けの生活管理Webアプリです。Phase 1では、Supabase Auth、共通レイアウト、買い物リスト、レシピストック、献立表を実装しています。家計簿はDB schemaとRLSまで作成済みです。
+家庭向けの生活管理Webアプリです。Supabase Auth、共通レイアウト、買い物リスト、レシピストック、献立表、家計簿を実装しています。
 
 ## 技術スタック
 
@@ -130,12 +123,5 @@ npm run dev
 - 献立表の週表示、追加、編集、削除、レシピ紐付け
 - レシピの追加、編集、削除、作ったチェック、お気に入り、材料管理
 - レシピ/献立から材料を買い物リストへ追加
+- 家計簿の追加、編集、削除、カテゴリ管理
 - Supabase RLS
-
-## 今後の改善案
-
-- 家計簿画面のPhase 2実装
-- PWAアイコンとオフラインキャッシュ
-- 家族共有用のhouseholdモデル
-- レシピタグとカテゴリ検索
-- 買い物リストの並び替えと店舗別まとめ表示
