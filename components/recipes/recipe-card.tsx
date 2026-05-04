@@ -1,5 +1,6 @@
-import { ExternalLink, Heart, Trash2, Utensils } from "lucide-react";
-import { deleteRecipe, toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
+import { ExternalLink, Heart, Utensils } from "lucide-react";
+import { toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
+import { DeleteRecipeButton } from "@/components/recipes/delete-recipe-button";
 import { RecipeEditModal } from "@/components/recipes/recipe-edit-modal";
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { Button } from "@/components/ui/button";
@@ -54,12 +55,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
             <Heart className={recipe.is_favorite ? "size-4 fill-rose-400 text-rose-400" : "size-4 text-muted-foreground"} aria-hidden />
           </SubmitButton>
         </form>
-        <form action={deleteRecipe}>
-          <input type="hidden" name="id" value={recipe.id} />
-          <SubmitButton variant="ghost" size="sm" className="size-8 min-h-8 min-w-8 p-0 text-red-400 hover:text-red-300">
-            <Trash2 className="size-4" aria-hidden />
-          </SubmitButton>
-        </form>
+        <DeleteRecipeButton recipeId={recipe.id} title={recipe.title} />
       </div>
     </article>
   );

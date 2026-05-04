@@ -1,8 +1,8 @@
 import { Search } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { RecipeAddFab } from "@/components/recipes/recipe-add-fab";
 import { RecipeCard } from "@/components/recipes/recipe-card";
-import { RecipeForm } from "@/components/recipes/recipe-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getRecipes } from "@/lib/db/recipes";
@@ -42,12 +42,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   return (
     <>
       <PageHeader title="📖 レシピ" />
-      <details className="rounded-lg border bg-card p-4">
-        <summary className="cursor-pointer list-none font-semibold text-white">➕ レシピを追加</summary>
-        <div className="mt-4">
-          <RecipeForm />
-        </div>
-      </details>
+      <RecipeAddFab />
 
       <form className="flex gap-2">
         <Input name="q" placeholder="料理名で検索" defaultValue={params.q ?? ""} />
@@ -75,7 +70,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
         {filteredRecipes.length > 0 ? (
           filteredRecipes.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe} />)
         ) : (
-          <EmptyState title="レシピがありません" description="上の追加フォームから最初のレシピを登録できます。" />
+          <EmptyState title="レシピがありません" description="右下の追加ボタンから登録できます。" />
         )}
       </section>
     </>
