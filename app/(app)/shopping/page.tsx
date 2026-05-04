@@ -53,13 +53,17 @@ export default async function ShoppingPage({
               </p>
             ) : null}
             <div className="rounded-lg border bg-card">
-              {group.items.map((item) => (
-                <ShoppingItemCard
-                  key={item.id}
-                  item={item}
-                  stores={stores}
-                />
-              ))}
+              <table className="w-full">
+                <tbody>
+                  {group.items.map((item) => (
+                    <ShoppingItemCard
+                      key={item.id}
+                      item={item}
+                      stores={stores}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
         ))
@@ -78,9 +82,13 @@ export default async function ShoppingPage({
             ✅ 購入済み {checkedItems.length}件
             <ClearCheckedButton count={checkedItems.length} />
           </summary>
-          {checkedItems.map((item) => (
-            <ShoppingItemCard key={item.id} item={item} stores={stores} />
-          ))}
+          <table className="w-full">
+            <tbody>
+              {checkedItems.map((item) => (
+                <ShoppingItemCard key={item.id} item={item} stores={stores} />
+              ))}
+            </tbody>
+          </table>
         </details>
       ) : null}
     </>

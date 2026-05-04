@@ -1,6 +1,78 @@
 # HomeHub
 
-HomeHubは、家庭向けの生活管理Webアプリです。Phase 1では、Supabase Auth、共通レイアウト、買い物リスト、レシピストック、献立表を実装しています。家計簿はDB schemaとRLSまで作成済みです。
+A household management web app for families. Phase 1 includes Supabase Auth, shared layout, shopping list, recipe stock, and meal planner. The household budget module has DB schema and RLS ready.
+
+## Tech Stack
+
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- Supabase Auth / PostgreSQL / Row Level Security
+- `@supabase/supabase-js` / `@supabase/ssr`
+- Local UI components (shadcn/ui-inspired)
+- `lucide-react` / `date-fns`
+
+## Setup
+
+```bash
+npm install
+cp .env.local.example .env.local
+npm run dev
+```
+
+Set your Supabase credentials in `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is the Publishable key (`sb_publishable_...`) found in Supabase Dashboard > Project Settings > API Keys.
+
+## Supabase Migration
+
+Using Supabase CLI:
+
+```bash
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
+
+Or paste the contents of `supabase/migrations/0001_initial_schema.sql` into the Supabase SQL Editor.
+
+## Dev Server
+
+```bash
+npm run dev
+```
+
+Runs at `http://localhost:3000` by default.
+
+## Features
+
+- Email/password authentication
+- Redirect to `/login` when unauthenticated
+- Mobile-first bottom navigation
+- Home summary dashboard
+- Shopping list: add, edit, delete, check toggle, store filter
+- Meal planner: weekly view, add, edit, delete, recipe linking
+- Recipes: add, edit, delete, cooked check, favorites, ingredient management
+- Add ingredients to shopping list from recipes/meal planner
+- Supabase Row Level Security
+
+## Roadmap
+
+- Phase 2: household budget UI
+- PWA icons and offline cache
+- Household sharing model
+- Recipe tags and category search
+- Shopping list sorting and store-grouped view
+
+---
+
+# HomeHub
+
+家庭向けの生活管理Webアプリです。Phase 1では、Supabase Auth、共通レイアウト、買い物リスト、レシピストック、献立表を実装しています。家計簿はDB schemaとRLSまで作成済みです。
 
 ## 技術スタック
 
@@ -8,11 +80,9 @@ HomeHubは、家庭向けの生活管理Webアプリです。Phase 1では、Sup
 - TypeScript
 - Tailwind CSS
 - Supabase Auth / PostgreSQL / Row Level Security
-- `@supabase/supabase-js`
-- `@supabase/ssr`
+- `@supabase/supabase-js` / `@supabase/ssr`
 - shadcn/ui風のローカルUIコンポーネント
-- `lucide-react`
-- `date-fns`
+- `lucide-react` / `date-fns`
 
 ## セットアップ
 
@@ -52,7 +122,7 @@ npm run dev
 
 ## 実装済み
 
-- メールリンクログイン
+- メール/パスワード認証
 - 未ログイン時の `/login` リダイレクト
 - モバイル向け下部ナビゲーション
 - ホームサマリー
@@ -69,4 +139,3 @@ npm run dev
 - 家族共有用のhouseholdモデル
 - レシピタグとカテゴリ検索
 - 買い物リストの並び替えと店舗別まとめ表示
-- 為替レート入力の補助
