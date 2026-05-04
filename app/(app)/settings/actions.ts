@@ -63,3 +63,69 @@ export async function joinHousehold(_prevState: ActionState, formData: FormData)
   revalidatePath("/", "layout");
   return { ok: true, message: "家族共有を設定しました。" };
 }
+
+export async function createStore(formData: FormData) {
+  const name = requiredString(formData.get("name"));
+  if (!name) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("ログインが必要です。");
+
+  const { error } = await supabase.from("stores").insert({
+    user_id: user.id,
+    name,
+    color: "#94a3b8",
+  });
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings");
+  revalidatePath("/shopping");
+}
+
+export async function deleteStore(formData: FormData) {
+  const id = requiredString(formData.get("id"));
+  if (!id) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("stores").delete().eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings");
+  revalidatePath("/shopping");
+}
+
+export async function createExpenseCategory(formData: FormData) {
+  const name = requiredString(formData.get("name"));
+  if (!name) return;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("ログインが必要です。");
+
+  const { error } = await supabase.from("expense_categories").insert({
+    user_id: user.id,
+    name,
+    color: "#94a3b8",
+  });
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings");
+  revalidatePath("/expenses");
+}
+
+export async function deleteExpenseCategory(formData: FormData) {
+  const id = requiredString(formData.get("id"));
+  if (!id) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("expense_categories").delete().eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings");
+  revalidatePath("/expenses");
+}

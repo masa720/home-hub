@@ -7,9 +7,10 @@ import { SubmitButton } from "@/components/ui/submit-button";
 
 type HouseholdFormProps = {
   householdId: string;
+  memberNames: string[];
 };
 
-export function HouseholdForm({ householdId }: HouseholdFormProps) {
+export function HouseholdForm({ householdId, memberNames }: HouseholdFormProps) {
   const [state, action] = useActionState(joinHousehold, {});
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -23,6 +24,18 @@ export function HouseholdForm({ householdId }: HouseholdFormProps) {
 
   return (
     <div className="space-y-3">
+      {memberNames.length > 0 ? (
+        <div>
+          <p className="text-xs text-muted-foreground">共有メンバー</p>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {memberNames.map((name) => (
+              <span key={name} className="rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary">
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div>
         <p className="text-xs text-muted-foreground">あなたの共有コード</p>
         <div className="mt-1 flex gap-2">

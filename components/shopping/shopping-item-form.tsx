@@ -6,7 +6,6 @@ import { Select } from "@/components/ui/select";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import type { ShoppingItemWithStore } from "@/lib/db/shopping";
-import { defaultStoreNames } from "@/lib/utils/stores";
 import type { Store } from "@/types/database";
 
 type ShoppingItemFormProps = {
@@ -18,11 +17,6 @@ type ShoppingItemFormProps = {
 
 export function ShoppingItemForm({ stores, item, compact = false, showCancel = false }: ShoppingItemFormProps) {
   const action = item ? updateShoppingItem : createShoppingItem;
-  const datalistId = `store-options-${item?.id ?? "new"}`;
-  const storeNames = [
-    ...defaultStoreNames,
-    ...stores.map((store) => store.name).filter((name) => !defaultStoreNames.includes(name as (typeof defaultStoreNames)[number])),
-  ];
 
   return (
     <form action={action} className="space-y-3 rounded-lg border bg-card p-4">
@@ -33,19 +27,14 @@ export function ShoppingItemForm({ stores, item, compact = false, showCancel = f
         <Input name="unit" placeholder="単位" defaultValue={item?.unit ?? "個"} />
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <Input
-            name="store_name"
-            list={datalistId}
-            placeholder="店舗を選択または入力"
-            defaultValue={item?.store?.name ?? ""}
-          />
-          <datalist id={datalistId}>
-            {storeNames.map((name) => (
-              <option key={name} value={name} />
-            ))}
-          </datalist>
-        </div>
+        <Select name="store_id" defaultValue={item?.store_id ?? ""}>
+          <option value="">店舗なし</option>
+          {stores.map((store) => (
+            <option key={store.id} value={store.id}>
+              {store.name}
+            </option>
+          ))}
+        </Select>
         <Select name="priority" defaultValue={item?.priority ?? "normal"}>
           <option value="normal">通常</option>
           <option value="high">優先</option>
