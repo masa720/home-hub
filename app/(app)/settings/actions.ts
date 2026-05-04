@@ -138,6 +138,22 @@ export async function reorderExpenseCategories(orderedIds: string[]) {
   revalidatePath("/expenses");
 }
 
+export async function updateStoreColor(id: string, color: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("stores").update({ color }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings/stores");
+  revalidatePath("/shopping");
+}
+
+export async function updateCategoryColor(id: string, color: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("expense_categories").update({ color }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/settings/categories");
+  revalidatePath("/expenses");
+}
+
 export async function deleteExpenseCategory(formData: FormData) {
   const id = requiredString(formData.get("id"));
   if (!id) return;

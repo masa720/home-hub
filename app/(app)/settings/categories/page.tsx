@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, ChevronLeft } from "lucide-react";
-import { createExpenseCategory, deleteExpenseCategory, reorderExpenseCategories } from "@/app/(app)/settings/actions";
+import { createExpenseCategory, deleteExpenseCategory, reorderExpenseCategories, updateCategoryColor } from "@/app/(app)/settings/actions";
 import { PageHeader } from "@/components/page-header";
 import { SortableList } from "@/components/settings/sortable-list";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ export default async function CategorySettingsPage() {
         <div className="border-b px-3 py-2">
           <p className="text-xs text-muted-foreground">{categories.length}件 ・ ドラッグで並び替え</p>
         </div>
-        <SortableList items={categories} deleteAction={deleteExpenseCategory} reorderAction={reorderExpenseCategories} />
+        <SortableList items={categories} deleteAction={deleteExpenseCategory} reorderAction={reorderExpenseCategories} updateColorAction={updateCategoryColor} />
       </section>
       <section className="rounded-lg border bg-card">
         <details>
