@@ -53,9 +53,6 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
           label={
             <>
               <span className={cn("text-sm font-medium text-white", item.is_checked && "line-through")}>{item.name}</span>
-              {item.priority === "high" ? (
-                <span className="ml-1.5 rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-200">!</span>
-              ) : null}
               {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
             </>
           }
@@ -63,10 +60,10 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
           <ShoppingItemForm stores={stores} item={item} showCancel />
         </ShoppingEditModal>
       </td>
-      <td className="w-24 py-2 pr-1 text-right align-middle">
+      <td className="py-2 pr-1 text-right align-middle">
         {item.store ? (
           <span
-            className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
+            className="inline-flex whitespace-nowrap items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
             style={storeBadgeStyle}
           >
             {item.store.name}

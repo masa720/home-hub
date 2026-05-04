@@ -128,3 +128,11 @@ export async function deleteShoppingItem(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidateShopping();
 }
+
+export async function clearCheckedItems() {
+  const { supabase, userId } = await getUserId();
+  const { error } = await supabase.from("shopping_items").delete().eq("user_id", userId).eq("is_checked", true);
+
+  if (error) throw new Error(error.message);
+  revalidateShopping();
+}

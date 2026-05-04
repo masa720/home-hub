@@ -78,8 +78,8 @@ export function MealDayCard({ date, plans, recipes }: MealDayCardProps) {
   const dayColor = getDayColor(date);
 
   return (
-    <tr className={cn("border-b border-border last:border-b-0", today && "bg-primary/5")}>
-      <td className="w-20 whitespace-nowrap px-3 py-2 align-top">
+    <tr className={cn("border-b border-border last:border-b-0", today && "bg-sky-500/15 [&>td]:border-l-sky-500/30")}>
+      <td className={cn("w-20 whitespace-nowrap px-3 py-2 align-top", today && "border-l-2 border-l-sky-400")}>
         <span className={cn("text-sm font-semibold", today ? "text-primary" : "text-white")}>
           {formatJaDate(date, "d")}
         </span>

@@ -42,7 +42,7 @@ export function MealCellModal({ label, note, children }: MealCellModalProps) {
             <X className="size-5" aria-hidden />
           </Button>
         </div>
-        <div className="p-4">
+        <div className="p-4" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
           {children}
         </div>
       </dialog>
