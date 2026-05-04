@@ -19,11 +19,6 @@ async function getUserId() {
   return { supabase, userId: user.id };
 }
 
-function normalizeRecipe(value: FormDataEntryValue | null) {
-  const recipeId = optionalString(value);
-  return recipeId === "none" ? null : recipeId;
-}
-
 function mealType(value: FormDataEntryValue | null): MealType {
   return requiredString(value) === "lunch" ? "lunch" : "dinner";
 }
@@ -44,7 +39,6 @@ export async function createMealPlan(formData: FormData) {
     title,
     date,
     meal_type: mealType(formData.get("meal_type")),
-    recipe_id: normalizeRecipe(formData.get("recipe_id")),
     note: optionalString(formData.get("note")),
   });
 
@@ -65,7 +59,6 @@ export async function updateMealPlan(formData: FormData) {
       title,
       date,
       meal_type: mealType(formData.get("meal_type")),
-      recipe_id: normalizeRecipe(formData.get("recipe_id")),
       note: optionalString(formData.get("note")),
     })
     .eq("id", id);
@@ -82,34 +75,5 @@ export async function deleteMealPlan(formData: FormData) {
   const { error } = await supabase.from("meal_plans").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateMeals();
-}
-
-export async function addMealIngredientsToShopping(formData: FormData) {
-  const mealPlanId = requiredString(formData.get("meal_plan_id"));
-  const recipeId = requiredString(formData.get("recipe_id"));
-  if (!mealPlanId || !recipeId) return;
-
-  const { supabase, userId } = await getUserId();
-  const { data, error } = await supabase.from("recipe_ingredients").select("*").eq("recipe_id", recipeId);
-  if (error) throw new Error(error.message);
-
-  const items = data.map((ingredient) => ({
-    user_id: userId,
-    name: ingredient.name,
-    quantity: ingredient.quantity,
-    unit: ingredient.unit,
-    note: ingredient.note,
-    recipe_id: recipeId,
-    meal_plan_id: mealPlanId,
-  }));
-
-  if (items.length > 0) {
-    const { error: insertError } = await supabase.from("shopping_items").insert(items);
-    if (insertError) throw new Error(insertError.message);
-  }
-
-  revalidatePath("/");
-  revalidatePath("/shopping");
   revalidateMeals();
 }

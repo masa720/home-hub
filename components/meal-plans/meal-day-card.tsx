@@ -1,35 +1,31 @@
-import { ShoppingCart, Trash2 } from "lucide-react";
-import { addMealIngredientsToShopping, deleteMealPlan } from "@/app/(app)/meal-plans/actions";
+import { Trash2 } from "lucide-react";
+import { deleteMealPlan } from "@/app/(app)/meal-plans/actions";
 import { MealForm } from "@/components/meal-plans/meal-form";
 import { MealCellModal } from "@/components/meal-plans/meal-cell-modal";
 import { SubmitButton } from "@/components/ui/submit-button";
-import type { MealPlanWithRecipe } from "@/lib/db/meal-plans";
 import { cn } from "@/lib/utils/cn";
 import { formatJaDate, isToday, toDateInputValue } from "@/lib/utils/dates";
-import type { MealType, Recipe } from "@/types/database";
+import type { MealPlan, MealType } from "@/types/database";
 
 type MealDayCardProps = {
   date: Date;
-  plans: MealPlanWithRecipe[];
-  recipes: Recipe[];
+  plans: MealPlan[];
 };
 
 function MealCell({
   mealType,
   plan,
-  recipes,
   dateValue,
 }: {
   mealType: MealType;
-  plan?: MealPlanWithRecipe;
-  recipes: Recipe[];
+  plan?: MealPlan;
   dateValue: string;
 }) {
   if (!plan) {
     return (
       <td className="border-l border-border px-2 py-2 align-top">
         <MealCellModal label="＋">
-          <MealForm recipes={recipes} date={dateValue} mealType={mealType} />
+          <MealForm date={dateValue} mealType={mealType} />
         </MealCellModal>
       </td>
     );
@@ -39,16 +35,6 @@ function MealCell({
     <td className="border-l border-border px-2 py-2 align-top">
       <MealCellModal label={plan.title} note={plan.note}>
         <div className="mb-3 flex flex-wrap gap-1">
-          {plan.recipe_id ? (
-            <form action={addMealIngredientsToShopping}>
-              <input type="hidden" name="meal_plan_id" value={plan.id} />
-              <input type="hidden" name="recipe_id" value={plan.recipe_id} />
-              <SubmitButton variant="secondary" size="sm" className="h-7 min-h-7 text-xs">
-                <ShoppingCart className="size-3" aria-hidden />
-                材料追加
-              </SubmitButton>
-            </form>
-          ) : null}
           <form action={deleteMealPlan}>
             <input type="hidden" name="id" value={plan.id} />
             <SubmitButton variant="ghost" size="sm" className="h-7 min-h-7 text-xs text-red-300">
@@ -57,7 +43,7 @@ function MealCell({
             </SubmitButton>
           </form>
         </div>
-        <MealForm recipes={recipes} plan={plan} />
+        <MealForm plan={plan} />
       </MealCellModal>
     </td>
   );
@@ -70,7 +56,7 @@ function getDayColor(date: Date): string | undefined {
   return undefined;
 }
 
-export function MealDayCard({ date, plans, recipes }: MealDayCardProps) {
+export function MealDayCard({ date, plans }: MealDayCardProps) {
   const dateValue = toDateInputValue(date);
   const lunch = plans.find((plan) => plan.meal_type === "lunch");
   const dinner = plans.find((plan) => plan.meal_type === "dinner");
@@ -87,8 +73,8 @@ export function MealDayCard({ date, plans, recipes }: MealDayCardProps) {
           ({formatJaDate(date, "E")})
         </span>
       </td>
-      <MealCell mealType="lunch" plan={lunch} recipes={recipes} dateValue={dateValue} />
-      <MealCell mealType="dinner" plan={dinner} recipes={recipes} dateValue={dateValue} />
+      <MealCell mealType="lunch" plan={lunch} dateValue={dateValue} />
+      <MealCell mealType="dinner" plan={dinner} dateValue={dateValue} />
     </tr>
   );
 }

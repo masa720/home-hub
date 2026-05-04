@@ -78,8 +78,6 @@ export type Database = {
           note: string | null;
           is_checked: boolean;
           priority: Priority;
-          recipe_id: string | null;
-          meal_plan_id: string | null;
           created_at: string;
           updated_at: string;
           checked_at: string | null;
@@ -94,8 +92,6 @@ export type Database = {
           note?: string | null;
           is_checked?: boolean;
           priority?: Priority;
-          recipe_id?: string | null;
-          meal_plan_id?: string | null;
           created_at?: string;
           updated_at?: string;
           checked_at?: string | null;
@@ -106,14 +102,12 @@ export type Database = {
           id: string;
           user_id: string;
           title: string;
-          description: string | null;
-          youtube_url: string | null;
           url_1: string | null;
           url_2: string | null;
+          url_3: string | null;
           memo: string | null;
           is_cooked: boolean;
           is_favorite: boolean;
-          cooked_count: number;
           created_at: string;
           updated_at: string;
         },
@@ -121,36 +115,12 @@ export type Database = {
           id?: string;
           user_id: string;
           title: string;
-          description?: string | null;
-          youtube_url?: string | null;
           url_1?: string | null;
           url_2?: string | null;
+          url_3?: string | null;
           memo?: string | null;
           is_cooked?: boolean;
           is_favorite?: boolean;
-          cooked_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        }
-      >;
-      recipe_ingredients: Table<
-        {
-          id: string;
-          recipe_id: string;
-          name: string;
-          quantity: string | null;
-          unit: string | null;
-          note: string | null;
-          created_at: string;
-          updated_at: string;
-        },
-        {
-          id?: string;
-          recipe_id: string;
-          name: string;
-          quantity?: string | null;
-          unit?: string | null;
-          note?: string | null;
           created_at?: string;
           updated_at?: string;
         }
@@ -172,7 +142,6 @@ export type Database = {
           date: string;
           meal_type: MealType;
           title: string;
-          recipe_id: string | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -183,7 +152,6 @@ export type Database = {
           date: string;
           meal_type: MealType;
           title: string;
-          recipe_id?: string | null;
           note?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -231,5 +199,4 @@ export type Database = {
 export type Store = Database["public"]["Tables"]["stores"]["Row"];
 export type ShoppingItem = Database["public"]["Tables"]["shopping_items"]["Row"];
 export type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
-export type RecipeIngredient = Database["public"]["Tables"]["recipe_ingredients"]["Row"];
 export type MealPlan = Database["public"]["Tables"]["meal_plans"]["Row"];

@@ -1,8 +1,7 @@
-import { Trash2 } from "lucide-react";
-import { deleteShoppingItem, toggleShoppingItem } from "@/app/(app)/shopping/actions";
+import { toggleShoppingItem } from "@/app/(app)/shopping/actions";
+import { DeleteShoppingItemButton } from "@/components/shopping/delete-shopping-item-button";
 import { ShoppingEditModal } from "@/components/shopping/shopping-edit-modal";
 import { ShoppingItemForm } from "@/components/shopping/shopping-item-form";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils/cn";
 import { storeColorMap } from "@/lib/utils/stores";
 import type { ShoppingItemWithStore } from "@/lib/db/shopping";
@@ -71,12 +70,7 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         ) : null}
       </td>
       <td className="w-8 py-2 pr-2 align-middle">
-        <form action={deleteShoppingItem}>
-          <input type="hidden" name="id" value={item.id} />
-          <SubmitButton variant="ghost" size="sm" className="size-7 min-h-7 min-w-7 p-0 text-red-400 hover:text-red-300">
-            <Trash2 className="size-3.5" aria-hidden />
-          </SubmitButton>
-        </form>
+        <DeleteShoppingItemButton itemId={item.id} name={item.name} />
       </td>
     </tr>
   );

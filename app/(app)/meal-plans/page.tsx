@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/page-header";
 import { MealDayCard } from "@/components/meal-plans/meal-day-card";
 import { WeekSelector } from "@/components/meal-plans/week-selector";
 import { getMealPlans } from "@/lib/db/meal-plans";
-import { getRecipes } from "@/lib/db/recipes";
 import { createClient } from "@/lib/supabase/server";
 import { getWeekDays, getWeekRange, toDateInputValue } from "@/lib/utils/dates";
 
@@ -16,10 +15,7 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
   const { start, end } = getWeekRange(baseDate);
   const weekDays = getWeekDays(baseDate);
   const supabase = await createClient();
-  const [plans, recipes] = await Promise.all([
-    getMealPlans(supabase, toDateInputValue(start), toDateInputValue(end)),
-    getRecipes(supabase),
-  ]);
+  const plans = await getMealPlans(supabase, toDateInputValue(start), toDateInputValue(end));
 
   return (
     <>
@@ -46,7 +42,6 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
                 <MealDayCard
                   key={dateValue}
                   date={day}
-                  recipes={recipes}
                   plans={plans.filter((plan) => plan.date === dateValue)}
                 />
               );

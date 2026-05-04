@@ -9,8 +9,7 @@ export function SubmitButton({ children, ...props }: ButtonProps) {
 
   return (
     <Button disabled={pending} {...props}>
-      {pending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
-      {pending ? "保存中" : children}
+      {pending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : children}
     </Button>
   );
 }

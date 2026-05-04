@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { BookPlus, CalendarPlus, ListPlus, Menu, PlusCircle, Settings, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,11 @@ const quickLinks = [
 
 export function AppMenu() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <div className="relative">
