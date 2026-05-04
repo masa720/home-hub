@@ -23,6 +23,11 @@ export function LoginForm() {
         <LogIn className="size-4" aria-hidden />
         ログイン
       </SubmitButton>
+      <div className="text-right">
+        <a href="/login/reset" className="text-xs text-muted-foreground hover:text-foreground">
+          パスワードを忘れた方
+        </a>
+      </div>
       {state.message ? (
         <p className="text-sm text-red-300">{state.message}</p>
       ) : null}
