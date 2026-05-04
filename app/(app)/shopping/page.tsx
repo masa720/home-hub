@@ -48,7 +48,7 @@ export default async function ShoppingPage({
         groupedItems.map((group) => (
           <section key={group.key}>
             {groupedItems.length > 1 ? (
-              <p className="px-1 pb-1 text-[11px] font-semibold text-muted-foreground">
+              <p className="px-1 pb-1 text-xs font-semibold text-muted-foreground">
                 {group.label}
               </p>
             ) : null}
