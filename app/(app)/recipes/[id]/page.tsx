@@ -27,7 +27,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
     <>
       <header className="space-y-4">
         <div>
-          <p className="text-sm font-semibold text-emerald-300">レシピ詳細</p>
+          <p className="text-sm font-semibold text-primary">レシピ詳細</p>
           <h1 className="mt-1 text-2xl font-bold text-white">{recipe.title}</h1>
           {recipe.description ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{recipe.description}</p> : null}
         </div>

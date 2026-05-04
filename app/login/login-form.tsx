@@ -20,7 +20,7 @@ export function LoginForm() {
         ログインリンクを送る
       </SubmitButton>
       {state.message ? (
-        <p className={state.ok ? "text-sm text-emerald-300" : "text-sm text-red-300"}>{state.message}</p>
+        <p className={state.ok ? "text-sm text-primary" : "text-sm text-red-300"}>{state.message}</p>
       ) : null}
     </form>
   );

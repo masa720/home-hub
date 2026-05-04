@@ -19,6 +19,9 @@ export function CancelButton({ children = "キャンセル" }: CancelButtonProps
         if (details) {
           details.open = false;
         }
+
+        const dialog = event.currentTarget.closest("dialog");
+        dialog?.close();
       }}
     >
       {children}
