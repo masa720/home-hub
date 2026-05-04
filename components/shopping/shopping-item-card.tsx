@@ -1,7 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { deleteShoppingItem, toggleShoppingItem } from "@/app/(app)/shopping/actions";
+import { ShoppingEditModal } from "@/components/shopping/shopping-edit-modal";
 import { ShoppingItemForm } from "@/components/shopping/shopping-item-form";
-import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils/cn";
 import { storeColorMap } from "@/lib/utils/stores";
@@ -48,18 +48,20 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         </form>
       </td>
       <td className="py-2 align-middle">
-        <details className="group">
-          <summary className="cursor-pointer list-none">
-            <span className={cn("text-sm font-medium text-white", item.is_checked && "line-through")}>{item.name}</span>
-            {item.priority === "high" ? (
-              <span className="ml-1.5 rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-200">!</span>
-            ) : null}
-            {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
-          </summary>
-          <div className="mt-2 rounded-lg border bg-card p-3 shadow-soft">
-            <ShoppingItemForm stores={stores} item={item} compact />
-          </div>
-        </details>
+        <ShoppingEditModal
+          title="買い物を編集"
+          label={
+            <>
+              <span className={cn("text-sm font-medium text-white", item.is_checked && "line-through")}>{item.name}</span>
+              {item.priority === "high" ? (
+                <span className="ml-1.5 rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-200">!</span>
+              ) : null}
+              {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
+            </>
+          }
+        >
+          <ShoppingItemForm stores={stores} item={item} showCancel />
+        </ShoppingEditModal>
       </td>
       <td className="w-24 py-2 pr-1 text-right align-middle">
         {item.store ? (
