@@ -32,44 +32,9 @@ export type ExpenseCategoryTotal = {
 };
 
 export async function getExpenseCategories(supabase: SupabaseServerClient) {
-  const { data, error } = await supabase.from("expense_categories").select("*").order("name");
+  const { data, error } = await supabase.from("expense_categories").select("*").order("sort_order").order("name");
   if (error) throw new Error(error.message);
-
-  const defaultOrder = [
-    "食費",
-    "外食費",
-    "外食",
-    "カフェ",
-    "日用品",
-    "交通",
-    "ガソリン",
-    "家賃",
-    "光熱費",
-    "通信費",
-    "サブスク",
-    "医療費",
-    "保険",
-    "美容",
-    "衣服",
-    "子ども用品",
-    "教育",
-    "交際費",
-    "娯楽",
-    "旅行",
-    "税金",
-    "雑費",
-    "給与",
-    "副業",
-    "その他",
-  ];
-  return data.toSorted((a, b) => {
-    const aIndex = defaultOrder.indexOf(a.name);
-    const bIndex = defaultOrder.indexOf(b.name);
-    if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
-    if (aIndex >= 0) return -1;
-    if (bIndex >= 0) return 1;
-    return a.name.localeCompare(b.name, "ja");
-  });
+  return data;
 }
 
 export async function getExpensesForMonth(supabase: SupabaseServerClient, baseDate: Date) {

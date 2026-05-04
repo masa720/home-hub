@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { Plus, X } from "lucide-react";
+import Link from "next/link";
+import { Plus, Settings, X } from "lucide-react";
 import { ExpenseForm } from "@/components/expenses/expense-form";
 import { Button } from "@/components/ui/button";
 import type { ExpenseCategory } from "@/types/database";
@@ -41,6 +42,14 @@ export function ExpenseAddFab({ categories, defaultEnteredByName }: ExpenseAddFa
         </div>
         <div className="p-4" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
           <ExpenseForm categories={categories} defaultEnteredByName={defaultEnteredByName} showCancel />
+          <Link
+            href="/settings/categories"
+            className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-white"
+            onClick={() => dialogRef.current?.close()}
+          >
+            <Settings className="size-3" aria-hidden />
+            カテゴリを管理
+          </Link>
         </div>
       </dialog>
     </>

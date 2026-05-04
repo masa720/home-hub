@@ -2,7 +2,6 @@ import "server-only";
 
 import type { ShoppingItem, Store } from "@/types/database";
 import type { createClient } from "@/lib/supabase/server";
-import { defaultStoreNames } from "@/lib/utils/stores";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -11,17 +10,9 @@ export type ShoppingItemWithStore = ShoppingItem & {
 };
 
 export async function getStores(supabase: SupabaseServerClient) {
-  const { data, error } = await supabase.from("stores").select("*").order("name");
+  const { data, error } = await supabase.from("stores").select("*").order("sort_order").order("name");
   if (error) throw new Error(error.message);
-  return data.toSorted((a, b) => {
-    const aIndex = defaultStoreNames.indexOf(a.name as (typeof defaultStoreNames)[number]);
-    const bIndex = defaultStoreNames.indexOf(b.name as (typeof defaultStoreNames)[number]);
-
-    if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
-    if (aIndex >= 0) return -1;
-    if (bIndex >= 0) return 1;
-    return a.name.localeCompare(b.name, "ja");
-  });
+  return data;
 }
 
 export async function getShoppingItems(supabase: SupabaseServerClient) {

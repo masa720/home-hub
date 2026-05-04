@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { Plus, X } from "lucide-react";
+import Link from "next/link";
+import { Plus, Settings, X } from "lucide-react";
 import { ShoppingItemForm } from "@/components/shopping/shopping-item-form";
 import { Button } from "@/components/ui/button";
 import type { Store } from "@/types/database";
@@ -42,6 +43,14 @@ export function ShoppingAddFab({ stores }: ShoppingAddFabProps) {
         </div>
         <div className="p-4" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
           <ShoppingItemForm stores={stores} showCancel />
+          <Link
+            href="/settings/stores"
+            className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-white"
+            onClick={() => dialogRef.current?.close()}
+          >
+            <Settings className="size-3" aria-hidden />
+            店舗を管理
+          </Link>
         </div>
       </dialog>
     </>

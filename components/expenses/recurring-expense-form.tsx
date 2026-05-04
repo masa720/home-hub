@@ -67,19 +67,22 @@ export function RecurringExpenseForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">
         <Input
           name="start_month"
           type="month"
           aria-label="開始月"
+          className="min-w-0 px-2"
           min={APP_START_MONTH}
           defaultValue={defaultStartMonth}
           required
         />
+        <span className="text-xs text-muted-foreground">〜</span>
         <Input
           name="end_month"
           type="month"
           aria-label="終了月"
+          className="min-w-0 px-2"
           min={APP_START_MONTH}
           defaultValue={defaultEndMonth}
         />

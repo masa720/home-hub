@@ -37,6 +37,7 @@ export type Database = {
           email: string | null;
           display_name: string | null;
           base_currency: Currency;
+          household_id: string;
           created_at: string;
           updated_at: string;
         },
@@ -45,6 +46,7 @@ export type Database = {
           email?: string | null;
           display_name?: string | null;
           base_currency?: Currency;
+          household_id?: string;
           created_at?: string;
           updated_at?: string;
         }
@@ -55,6 +57,7 @@ export type Database = {
           user_id: string;
           name: string;
           color: string | null;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         },
@@ -63,6 +66,7 @@ export type Database = {
           user_id: string;
           name: string;
           color?: string | null;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         }
@@ -163,6 +167,7 @@ export type Database = {
           user_id: string;
           name: string;
           color: string | null;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         },
@@ -171,6 +176,7 @@ export type Database = {
           user_id: string;
           name: string;
           color?: string | null;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         }
@@ -248,7 +254,12 @@ export type Database = {
       >;
     } & Record<string, Table<DbRecord>>;
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      verify_household_code: {
+        Args: { code: string };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
