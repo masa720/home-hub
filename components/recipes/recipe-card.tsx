@@ -1,9 +1,11 @@
+"use client";
+
+import { useOptimistic, useTransition } from "react";
 import { Heart } from "lucide-react";
 import { toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
 import { DeleteRecipeButton } from "@/components/recipes/delete-recipe-button";
 import { RecipeEditModal } from "@/components/recipes/recipe-edit-modal";
 import { RecipeForm } from "@/components/recipes/recipe-form";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils/cn";
 import type { Recipe } from "@/types/database";
 
@@ -12,22 +14,43 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
+  const [optimisticCooked, setOptimisticCooked] = useOptimistic(recipe.is_cooked);
+  const [optimisticFavorite, setOptimisticFavorite] = useOptimistic(recipe.is_favorite);
+  const [, startTransition] = useTransition();
+
+  function handleToggleCooked() {
+    const formData = new FormData();
+    formData.append("id", recipe.id);
+    formData.append("is_cooked", String(recipe.is_cooked));
+    startTransition(async () => {
+      setOptimisticCooked(!optimisticCooked);
+      await toggleRecipeCooked(formData);
+    });
+  }
+
+  function handleToggleFavorite() {
+    const formData = new FormData();
+    formData.append("id", recipe.id);
+    formData.append("is_favorite", String(recipe.is_favorite));
+    startTransition(async () => {
+      setOptimisticFavorite(!optimisticFavorite);
+      await toggleRecipeFavorite(formData);
+    });
+  }
+
   return (
     <article className="flex items-center gap-3 rounded-lg border bg-card p-4">
-      <form action={toggleRecipeCooked}>
-        <input type="hidden" name="id" value={recipe.id} />
-        <input type="hidden" name="is_cooked" value={String(recipe.is_cooked)} />
-        <button
-          type="submit"
-          aria-label={recipe.is_cooked ? "未作成に戻す" : "作ったにする"}
-          className={cn(
-            "flex size-6 shrink-0 items-center justify-center rounded border-2 text-xs",
-            recipe.is_cooked ? "border-primary bg-primary text-primary-foreground" : "border-slate-500 bg-slate-950",
-          )}
-        >
-          {recipe.is_cooked ? "✓" : ""}
-        </button>
-      </form>
+      <button
+        type="button"
+        onClick={handleToggleCooked}
+        aria-label={optimisticCooked ? "未作成に戻す" : "作ったにする"}
+        className={cn(
+          "flex size-6 shrink-0 items-center justify-center rounded border-2 text-xs",
+          optimisticCooked ? "border-primary bg-primary text-primary-foreground" : "border-slate-500 bg-slate-950",
+        )}
+      >
+        {optimisticCooked ? "✓" : ""}
+      </button>
 
       <RecipeEditModal
         title="✏️ レシピを編集"
@@ -42,13 +65,14 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
       </RecipeEditModal>
 
       <div className="flex shrink-0 items-center gap-1">
-        <form action={toggleRecipeFavorite}>
-          <input type="hidden" name="id" value={recipe.id} />
-          <input type="hidden" name="is_favorite" value={String(recipe.is_favorite)} />
-          <SubmitButton variant="ghost" size="sm" className="size-8 min-h-8 min-w-8 p-0">
-            <Heart className={recipe.is_favorite ? "size-4 fill-rose-400 text-rose-400" : "size-4 text-muted-foreground"} aria-hidden />
-          </SubmitButton>
-        </form>
+        <button
+          type="button"
+          onClick={handleToggleFavorite}
+          aria-label={optimisticFavorite ? "お気に入り解除" : "お気に入りに追加"}
+          className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <Heart className={optimisticFavorite ? "size-4 fill-rose-400 text-rose-400" : "size-4 text-muted-foreground"} aria-hidden />
+        </button>
         <DeleteRecipeButton recipeId={recipe.id} title={recipe.title} />
       </div>
     </article>

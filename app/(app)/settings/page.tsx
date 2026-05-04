@@ -2,6 +2,7 @@ import { LogOut } from "lucide-react";
 import { signOut } from "@/app/login/actions";
 import { PageHeader } from "@/components/page-header";
 import { DisplayNameForm } from "@/components/settings/display-name-form";
+import { HouseholdForm } from "@/components/settings/household-form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { getProfile } from "@/lib/db/profiles";
 import { createClient } from "@/lib/supabase/server";
@@ -25,6 +26,12 @@ export default async function SettingsPage() {
         <div>
           <p className="text-sm font-semibold text-muted-foreground">📧 メールアドレス</p>
           <p className="mt-1 text-white">{user?.email}</p>
+        </div>
+      </section>
+      <section className="rounded-lg border bg-card p-4">
+        <p className="text-sm font-semibold text-muted-foreground">👨‍👩‍👧 家族共有</p>
+        <div className="mt-2">
+          <HouseholdForm householdId={profile?.household_id ?? ""} />
         </div>
       </section>
       <form action={signOut}>

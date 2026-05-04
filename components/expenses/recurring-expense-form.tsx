@@ -67,7 +67,7 @@ export function RecurringExpenseForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <Input
           name="start_month"
           type="month"
@@ -76,6 +76,7 @@ export function RecurringExpenseForm({
           defaultValue={defaultStartMonth}
           required
         />
+        <span className="text-sm text-muted-foreground">〜</span>
         <Input
           name="end_month"
           type="month"
