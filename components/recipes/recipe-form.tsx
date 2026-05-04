@@ -24,12 +24,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       </div>
       <Input name="url_2" type="url" placeholder="予備URL" defaultValue={recipe?.url_2 ?? ""} />
       <Textarea name="memo" placeholder="メモ" defaultValue={recipe?.memo ?? ""} />
-      {!recipe ? (
-        <Textarea
-          name="ingredients_text"
-          placeholder={"材料をまとめて追加\n例: 玉ねぎ | 1 | 個 | みじん切り"}
-        />
-      ) : null}
       <div className="flex justify-end gap-2">
         <CancelButton />
         <SubmitButton>

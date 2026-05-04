@@ -1,8 +1,6 @@
 import { ExternalLink, Heart, Trash2, Utensils } from "lucide-react";
 import { notFound } from "next/navigation";
 import { addRecipeToMealPlan, deleteRecipe, toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
-import { IngredientForm } from "@/components/recipes/ingredient-form";
-import { IngredientList } from "@/components/recipes/ingredient-list";
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { Button } from "@/components/ui/button";
 import { CancelButton } from "@/components/ui/cancel-button";
@@ -81,12 +79,6 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
             <SubmitButton>追加</SubmitButton>
           </div>
         </form>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-white">材料</h2>
-        <IngredientList recipeId={recipe.id} ingredients={recipe.ingredients} />
-        <IngredientForm recipeId={recipe.id} />
       </section>
 
       <details className="rounded-lg border bg-card p-4">

@@ -84,32 +84,3 @@ export async function deleteMealPlan(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidateMeals();
 }
-
-export async function addMealIngredientsToShopping(formData: FormData) {
-  const mealPlanId = requiredString(formData.get("meal_plan_id"));
-  const recipeId = requiredString(formData.get("recipe_id"));
-  if (!mealPlanId || !recipeId) return;
-
-  const { supabase, userId } = await getUserId();
-  const { data, error } = await supabase.from("recipe_ingredients").select("*").eq("recipe_id", recipeId);
-  if (error) throw new Error(error.message);
-
-  const items = data.map((ingredient) => ({
-    user_id: userId,
-    name: ingredient.name,
-    quantity: ingredient.quantity,
-    unit: ingredient.unit,
-    note: ingredient.note,
-    recipe_id: recipeId,
-    meal_plan_id: mealPlanId,
-  }));
-
-  if (items.length > 0) {
-    const { error: insertError } = await supabase.from("shopping_items").insert(items);
-    if (insertError) throw new Error(insertError.message);
-  }
-
-  revalidatePath("/");
-  revalidatePath("/shopping");
-  revalidateMeals();
-}

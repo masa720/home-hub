@@ -1,5 +1,5 @@
-import { ShoppingCart, Trash2 } from "lucide-react";
-import { addMealIngredientsToShopping, deleteMealPlan } from "@/app/(app)/meal-plans/actions";
+import { Trash2 } from "lucide-react";
+import { deleteMealPlan } from "@/app/(app)/meal-plans/actions";
 import { MealForm } from "@/components/meal-plans/meal-form";
 import { MealCellModal } from "@/components/meal-plans/meal-cell-modal";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -39,16 +39,6 @@ function MealCell({
     <td className="border-l border-border px-2 py-2 align-top">
       <MealCellModal label={plan.title} note={plan.note}>
         <div className="mb-3 flex flex-wrap gap-1">
-          {plan.recipe_id ? (
-            <form action={addMealIngredientsToShopping}>
-              <input type="hidden" name="meal_plan_id" value={plan.id} />
-              <input type="hidden" name="recipe_id" value={plan.recipe_id} />
-              <SubmitButton variant="secondary" size="sm" className="h-7 min-h-7 text-xs">
-                <ShoppingCart className="size-3" aria-hidden />
-                材料追加
-              </SubmitButton>
-            </form>
-          ) : null}
           <form action={deleteMealPlan}>
             <input type="hidden" name="id" value={plan.id} />
             <SubmitButton variant="ghost" size="sm" className="h-7 min-h-7 text-xs text-red-300">
