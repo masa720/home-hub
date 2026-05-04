@@ -91,6 +91,14 @@
   .tap-target {
     @apply min-h-11 min-w-11;
   }
+
+  .store-badge {
+    color: var(--store-text-light);
+  }
+}
+
+html.dark .store-badge {
+  color: var(--store-text-dark);
 }
 
 @property --pie-progress {
