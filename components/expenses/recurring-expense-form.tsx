@@ -67,7 +67,8 @@ export function RecurringExpenseForm({
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1">
+      <fieldset className="space-y-1.5">
+        <legend className="text-xs text-muted-foreground">期間</legend>
         <Input
           name="start_month"
           type="month"
@@ -77,7 +78,6 @@ export function RecurringExpenseForm({
           defaultValue={defaultStartMonth}
           required
         />
-        <span className="text-xs text-muted-foreground">〜</span>
         <Input
           name="end_month"
           type="month"
@@ -85,8 +85,9 @@ export function RecurringExpenseForm({
           className="min-w-0 px-2"
           min={APP_START_MONTH}
           defaultValue={defaultEndMonth}
+          placeholder="終了月（未定の場合は空欄）"
         />
-      </div>
+      </fieldset>
 
       <Textarea name="memo" placeholder="メモ" defaultValue={recurringExpense?.memo ?? ""} />
 
