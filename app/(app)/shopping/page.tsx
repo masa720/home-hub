@@ -1,10 +1,13 @@
+import { clearCheckedItems } from "@/app/(app)/shopping/actions";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { ShoppingAddFab } from "@/components/shopping/shopping-add-fab";
 import { ShoppingItemCard } from "@/components/shopping/shopping-item-card";
 import { StoreFilter } from "@/components/shopping/store-filter";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { getShoppingItems, getStores } from "@/lib/db/shopping";
 import { createClient } from "@/lib/supabase/server";
+import { Trash2 } from "lucide-react";
 
 type ShoppingPageProps = {
   searchParams: Promise<{ store?: string }>;
@@ -43,6 +46,14 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
           <summary className="cursor-pointer list-none px-3 py-2 text-sm font-semibold text-muted-foreground">
             購入済み {checkedItems.length}件
           </summary>
+          <div className="flex justify-end border-b px-3 py-2">
+            <form action={clearCheckedItems}>
+              <SubmitButton variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
+                <Trash2 className="size-3.5" aria-hidden />
+                一括クリア
+              </SubmitButton>
+            </form>
+          </div>
           <table className="w-full">
             <tbody>
               {checkedItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)}
