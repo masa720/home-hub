@@ -12,9 +12,9 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="設定" />
+      <PageHeader title="⚙️ 設定" />
       <section className="rounded-lg border bg-card p-4">
-        <p className="text-sm font-semibold text-muted-foreground">ログイン中</p>
+        <p className="text-sm font-semibold text-muted-foreground">👤 ログイン中</p>
         <p className="mt-2 text-white">{user?.email}</p>
       </section>
       <form action={signOut}>

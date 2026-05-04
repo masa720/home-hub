@@ -23,16 +23,16 @@ export default async function HomePage() {
 
   return (
     <>
-      <PageHeader title="ホーム" />
+      <PageHeader title="🏠 ホーム" />
 
       <section className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm font-semibold text-primary">今日のランチ</p>
+          <p className="text-sm font-semibold text-primary">🍳 今日のランチ</p>
           <h2 className="mt-2 text-lg font-bold text-white">{lunch?.title ?? "未登録"}</h2>
           {lunch?.note ? <p className="mt-2 text-sm text-muted-foreground">{lunch.note}</p> : null}
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm font-semibold text-sky-300">今日のディナー</p>
+          <p className="text-sm font-semibold text-sky-300">🍽️ 今日のディナー</p>
           <h2 className="mt-2 text-lg font-bold text-white">{dinner?.title ?? "未登録"}</h2>
           {dinner?.note ? <p className="mt-2 text-sm text-muted-foreground">{dinner.note}</p> : null}
         </div>
@@ -40,7 +40,7 @@ export default async function HomePage() {
 
       <section className="rounded-lg border bg-card p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold text-white">未購入の買い物</h2>
+          <h2 className="font-semibold text-white">🛒 未購入の買い物</h2>
           <Button asChild variant="ghost" size="sm">
             <Link href="/shopping">開く</Link>
           </Button>
@@ -65,7 +65,7 @@ export default async function HomePage() {
       </section>
 
       <section className="rounded-lg border bg-card p-4">
-        <p className="text-sm font-semibold text-muted-foreground">今月の支出合計 CAD換算</p>
+        <p className="text-sm font-semibold text-muted-foreground">💰 今月の支出合計 CAD換算</p>
         <p className="mt-2 text-3xl font-bold text-white">{formatCurrency(expenseTotal, "CAD")}</p>
         <p className="mt-2 text-sm text-muted-foreground">家計簿画面の入力UIはPhase 2で追加予定です。</p>
       </section>

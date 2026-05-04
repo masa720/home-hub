@@ -37,7 +37,7 @@ export function MealCellModal({ label, note, children }: MealCellModalProps) {
         }}
       >
         <div className="flex items-center justify-between gap-3 border-b p-4">
-          <h2 className="font-semibold text-white">{isEmpty ? "献立を追加" : "献立を編集"}</h2>
+          <h2 className="font-semibold text-white">{isEmpty ? "📅 献立を追加" : "✏️ 献立を編集"}</h2>
           <Button type="button" variant="ghost" size="icon" aria-label="閉じる" onClick={() => dialogRef.current?.close()}>
             <X className="size-5" aria-hidden />
           </Button>

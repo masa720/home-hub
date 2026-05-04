@@ -27,9 +27,9 @@ export default async function ShoppingPage({
   const checkedItems = filteredItems.filter((item) => item.is_checked);
 
   const priorityGroups = [
-    { key: "high", label: "優先" },
-    { key: "normal", label: "通常" },
-    { key: "low", label: "低め" },
+    { key: "high", label: "🔥 優先" },
+    { key: "normal", label: "📌 通常" },
+    { key: "low", label: "💤 低め" },
   ] as const;
   const groupedItems = priorityGroups
     .map((group) => ({
@@ -40,7 +40,7 @@ export default async function ShoppingPage({
 
   return (
     <>
-      <PageHeader title="買い物リスト" />
+      <PageHeader title="🛒 買い物リスト" />
       <ShoppingAddFab stores={stores} />
       <StoreFilter stores={stores} currentStoreId={store} />
 
@@ -79,7 +79,7 @@ export default async function ShoppingPage({
       {checkedItems.length > 0 ? (
         <details className="rounded-lg border bg-card/70">
           <summary className="flex cursor-pointer list-none items-center px-3 py-2 text-sm font-semibold text-muted-foreground">
-            購入済み {checkedItems.length}件
+            ✅ 購入済み {checkedItems.length}件
             <ClearCheckedButton count={checkedItems.length} />
           </summary>
           <table className="w-full">

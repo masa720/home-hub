@@ -41,9 +41,9 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
 
   return (
     <>
-      <PageHeader title="レシピ" />
+      <PageHeader title="📖 レシピ" />
       <details className="rounded-lg border bg-card p-4">
-        <summary className="cursor-pointer list-none font-semibold text-white">レシピを追加</summary>
+        <summary className="cursor-pointer list-none font-semibold text-white">➕ レシピを追加</summary>
         <div className="mt-4">
           <RecipeForm />
         </div>

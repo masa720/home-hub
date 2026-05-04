@@ -38,7 +38,7 @@ export function AppMenu() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 top-12 z-50 w-72 rounded-lg border bg-card p-3 shadow-soft">
-            <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">クイック操作</p>
+            <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">⚡ クイック操作</p>
             <div className="grid gap-2">
               {quickLinks.map((item) => {
                 const Icon = item.icon;
