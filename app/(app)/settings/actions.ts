@@ -74,10 +74,11 @@ export async function createStore(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("ログインが必要です。");
 
+  const color = requiredString(formData.get("color")) || "#94a3b8";
   const { error } = await supabase.from("stores").insert({
     user_id: user.id,
     name,
-    color: "#94a3b8",
+    color,
   });
 
   if (error) throw new Error(error.message);
@@ -107,10 +108,11 @@ export async function createExpenseCategory(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("ログインが必要です。");
 
+  const color = requiredString(formData.get("color")) || "#94a3b8";
   const { error } = await supabase.from("expense_categories").insert({
     user_id: user.id,
     name,
-    color: "#94a3b8",
+    color,
   });
 
   if (error) throw new Error(error.message);

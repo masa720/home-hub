@@ -97,7 +97,7 @@ export function ColorPicker({ value, name, onChange }: ColorPickerProps) {
 
   return (
     <div className="space-y-2 py-1">
-      <div className="flex gap-2">
+      <div className="flex gap-2" style={{ maxWidth: 200 }}>
         <div
           ref={svRef}
           className="relative aspect-square flex-1 cursor-crosshair rounded-lg border border-border touch-none"

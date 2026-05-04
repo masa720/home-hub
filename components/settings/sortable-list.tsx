@@ -37,17 +37,20 @@ type SortableListProps = {
 
 function SortableRow({
   item,
+  isPickerOpen,
+  onTogglePicker,
   showBadgePreview,
   deleteAction,
   updateColorAction,
 }: {
   item: SortableItem;
+  isPickerOpen: boolean;
+  onTogglePicker: (id: string) => void;
   showBadgePreview?: boolean;
   deleteAction: (formData: FormData) => void;
   updateColorAction?: (id: string, color: string) => Promise<void>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
-  const [showPicker, setShowPicker] = useState(false);
   const [color, setColor] = useState(item.color ?? "#94a3b8");
   const [, startTransition] = useTransition();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -87,7 +90,7 @@ function SortableRow({
             type="button"
             className="size-5 shrink-0 rounded-full border border-white/20"
             style={{ backgroundColor: color }}
-            onClick={() => setShowPicker(!showPicker)}
+            onClick={() => onTogglePicker(item.id)}
             aria-label="色を変更"
           />
         ) : item.color ? (
@@ -106,7 +109,7 @@ function SortableRow({
           </Button>
         </form>
       </div>
-      {showPicker ? (
+      {isPickerOpen ? (
         <div className="px-3 pb-2">
           <ColorPicker
             value={color}
@@ -121,12 +124,17 @@ function SortableRow({
 
 export function SortableList({ items: initialItems, showBadgePreview, deleteAction, reorderAction, updateColorAction }: SortableListProps) {
   const [items, setItems] = useState(initialItems);
+  const [openPickerId, setOpenPickerId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
   );
+
+  function handleTogglePicker(id: string) {
+    setOpenPickerId((prev) => (prev === id ? null : id));
+  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -149,6 +157,8 @@ export function SortableList({ items: initialItems, showBadgePreview, deleteActi
           <SortableRow
             key={item.id}
             item={item}
+            isPickerOpen={openPickerId === item.id}
+            onTogglePicker={handleTogglePicker}
             showBadgePreview={showBadgePreview}
             deleteAction={deleteAction}
             updateColorAction={updateColorAction}
