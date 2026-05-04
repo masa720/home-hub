@@ -1,14 +1,11 @@
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, LogOut } from "lucide-react";
 import { signOut } from "@/app/login/actions";
 import { PageHeader } from "@/components/page-header";
-import { CategorySettings } from "@/components/settings/category-settings";
 import { DisplayNameForm } from "@/components/settings/display-name-form";
 import { HouseholdForm } from "@/components/settings/household-form";
-import { StoreSettings } from "@/components/settings/store-settings";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { getExpenseCategories } from "@/lib/db/expenses";
 import { getProfile } from "@/lib/db/profiles";
-import { getStores } from "@/lib/db/shopping";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsPage() {
@@ -17,13 +14,8 @@ export default async function SettingsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [profile, stores, categories] = await Promise.all([
-    user ? getProfile(supabase, user.id) : null,
-    getStores(supabase),
-    getExpenseCategories(supabase),
-  ]);
+  const profile = user ? await getProfile(supabase, user.id) : null;
 
-  // Fetch household member names (other members only)
   let memberNames: string[] = [];
   if (profile?.household_id) {
     const { data: members } = await supabase
@@ -55,8 +47,16 @@ export default async function SettingsPage() {
           <HouseholdForm householdId={profile?.household_id ?? ""} memberNames={memberNames} />
         </div>
       </section>
-      <StoreSettings stores={stores} />
-      <CategorySettings categories={categories} />
+      <nav className="overflow-hidden rounded-lg border bg-card">
+        <Link href="/settings/stores" className="flex items-center justify-between px-4 py-3 text-white hover:bg-muted/50">
+          <span className="text-sm font-semibold">🏪 店舗</span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
+        <Link href="/settings/categories" className="flex items-center justify-between border-t px-4 py-3 text-white hover:bg-muted/50">
+          <span className="text-sm font-semibold">📂 支出カテゴリ</span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
+      </nav>
       <form action={signOut}>
         <SubmitButton variant="ghost" className="w-full text-red-400">
           <LogOut className="size-4" aria-hidden />

@@ -1,17 +1,3 @@
-export const defaultStoreNames = [
-  "リカーショップ",
-  "スーパーストア",
-  "T&T",
-  "コストコ",
-  "ウォルマート",
-  "ダララマ",
-  "ダイソー",
-  "シティマーケット",
-  "ロンドンドラッグ",
-  "セーフウェイ",
-  "Hマート",
-] as const;
-
 export const storeColorMap: Record<string, { background: string; border: string; textLight: string; textDark: string }> = {
   リカーショップ: { background: "#b7a3cf33", border: "#b7a3cf", textLight: "#6b4d8a", textDark: "#c4b3d9" },
   スーパーストア: { background: "#fde5d933", border: "#f4c9b8", textLight: "#a0573e", textDark: "#f0b89e" },

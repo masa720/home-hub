@@ -81,7 +81,7 @@ export async function createStore(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  revalidatePath("/settings");
+  revalidatePath("/settings/stores");
   revalidatePath("/shopping");
 }
 
@@ -93,7 +93,7 @@ export async function deleteStore(formData: FormData) {
   const { error } = await supabase.from("stores").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidatePath("/settings");
+  revalidatePath("/settings/stores");
   revalidatePath("/shopping");
 }
 
@@ -114,7 +114,27 @@ export async function createExpenseCategory(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  revalidatePath("/settings");
+  revalidatePath("/settings/categories");
+  revalidatePath("/expenses");
+}
+
+export async function reorderStores(orderedIds: string[]) {
+  const supabase = await createClient();
+  const updates = orderedIds.map((id, index) =>
+    supabase.from("stores").update({ sort_order: index + 1 }).eq("id", id),
+  );
+  await Promise.all(updates);
+  revalidatePath("/settings/stores");
+  revalidatePath("/shopping");
+}
+
+export async function reorderExpenseCategories(orderedIds: string[]) {
+  const supabase = await createClient();
+  const updates = orderedIds.map((id, index) =>
+    supabase.from("expense_categories").update({ sort_order: index + 1 }).eq("id", id),
+  );
+  await Promise.all(updates);
+  revalidatePath("/settings/categories");
   revalidatePath("/expenses");
 }
 
@@ -126,6 +146,6 @@ export async function deleteExpenseCategory(formData: FormData) {
   const { error } = await supabase.from("expense_categories").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidatePath("/settings");
+  revalidatePath("/settings/categories");
   revalidatePath("/expenses");
 }
