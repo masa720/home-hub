@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import {
   DndContext,
   closestCenter,
@@ -18,14 +18,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
+import { ColorPicker } from "@/components/settings/color-picker";
 import { Button } from "@/components/ui/button";
-
-const PALETTE = [
-  "#ef4444", "#f97316", "#f59e0b", "#eab308", "#84cc16",
-  "#22c55e", "#14b8a6", "#06b6d4", "#0ea5e9", "#3b82f6",
-  "#6366f1", "#8b5cf6", "#a855f7", "#d946ef", "#ec4899",
-  "#f43f5e", "#64748b", "#94a3b8",
-];
 
 type SortableItem = {
   id: string;
@@ -35,6 +29,7 @@ type SortableItem = {
 
 type SortableListProps = {
   items: SortableItem[];
+  showBadgePreview?: boolean;
   deleteAction: (formData: FormData) => void;
   reorderAction: (orderedIds: string[]) => Promise<void>;
   updateColorAction?: (id: string, color: string) => Promise<void>;
@@ -42,22 +37,35 @@ type SortableListProps = {
 
 function SortableRow({
   item,
+  showBadgePreview,
   deleteAction,
   updateColorAction,
 }: {
   item: SortableItem;
+  showBadgePreview?: boolean;
   deleteAction: (formData: FormData) => void;
   updateColorAction?: (id: string, color: string) => Promise<void>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
-  const [showPalette, setShowPalette] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
   const [color, setColor] = useState(item.color ?? "#94a3b8");
   const [, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  function handleColorChange(newColor: string) {
+    setColor(newColor);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      startTransition(async () => {
+        await updateColorAction!(item.id, newColor);
+      });
+    }, 300);
+  }
 
   return (
     <div
@@ -79,7 +87,7 @@ function SortableRow({
             type="button"
             className="size-5 shrink-0 rounded-full border border-white/20"
             style={{ backgroundColor: color }}
-            onClick={() => setShowPalette(!showPalette)}
+            onClick={() => setShowPicker(!showPicker)}
             aria-label="色を変更"
           />
         ) : item.color ? (
@@ -98,30 +106,20 @@ function SortableRow({
           </Button>
         </form>
       </div>
-      {showPalette ? (
-        <div className="flex flex-wrap gap-2 px-3 pb-2">
-          {PALETTE.map((c) => (
-            <button
-              key={c}
-              type="button"
-              className={`size-7 rounded-full border-2 ${color === c ? "border-white" : "border-transparent"}`}
-              style={{ backgroundColor: c }}
-              onClick={() => {
-                setColor(c);
-                setShowPalette(false);
-                startTransition(async () => {
-                  await updateColorAction!(item.id, c);
-                });
-              }}
-            />
-          ))}
+      {showPicker ? (
+        <div className="px-3 pb-2">
+          <ColorPicker
+            value={color}
+            name={showBadgePreview ? item.name : undefined}
+            onChange={handleColorChange}
+          />
         </div>
       ) : null}
     </div>
   );
 }
 
-export function SortableList({ items: initialItems, deleteAction, reorderAction, updateColorAction }: SortableListProps) {
+export function SortableList({ items: initialItems, showBadgePreview, deleteAction, reorderAction, updateColorAction }: SortableListProps) {
   const [items, setItems] = useState(initialItems);
   const [, startTransition] = useTransition();
 
@@ -148,7 +146,13 @@ export function SortableList({ items: initialItems, deleteAction, reorderAction,
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         {items.map((item) => (
-          <SortableRow key={item.id} item={item} deleteAction={deleteAction} updateColorAction={updateColorAction} />
+          <SortableRow
+            key={item.id}
+            item={item}
+            showBadgePreview={showBadgePreview}
+            deleteAction={deleteAction}
+            updateColorAction={updateColorAction}
+          />
         ))}
       </SortableContext>
     </DndContext>

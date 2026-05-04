@@ -30,7 +30,7 @@ export default async function StoreSettingsPage() {
         <div className="border-b px-3 py-2">
           <p className="text-xs text-muted-foreground">{stores.length}件 ・ ドラッグで並び替え</p>
         </div>
-        <SortableList items={stores} deleteAction={deleteStore} reorderAction={reorderStores} updateColorAction={updateStoreColor} />
+        <SortableList items={stores} showBadgePreview deleteAction={deleteStore} reorderAction={reorderStores} updateColorAction={updateStoreColor} />
       </section>
       <section className="rounded-lg border bg-card">
         <details>
