@@ -12,21 +12,31 @@ type ShoppingPageProps = {
   searchParams: Promise<{ store?: string }>;
 };
 
-export default async function ShoppingPage({ searchParams }: ShoppingPageProps) {
+export default async function ShoppingPage({
+  searchParams,
+}: ShoppingPageProps) {
   const { store } = await searchParams;
   const supabase = await createClient();
-  const [stores, items] = await Promise.all([getStores(supabase), getShoppingItems(supabase)]);
-  const filteredItems = store ? items.filter((item) => item.store_id === store) : items;
+  const [stores, items] = await Promise.all([
+    getStores(supabase),
+    getShoppingItems(supabase),
+  ]);
+  const filteredItems = store
+    ? items.filter((item) => item.store_id === store)
+    : items;
   const openItems = filteredItems.filter((item) => !item.is_checked);
   const checkedItems = filteredItems.filter((item) => item.is_checked);
 
   const priorityGroups = [
     { key: "high", label: "優先" },
     { key: "normal", label: "通常" },
-    { key: "low", label: "低い" },
+    { key: "low", label: "低め" },
   ] as const;
   const groupedItems = priorityGroups
-    .map((group) => ({ ...group, items: openItems.filter((item) => item.priority === group.key) }))
+    .map((group) => ({
+      ...group,
+      items: openItems.filter((item) => item.priority === group.key),
+    }))
     .filter((group) => group.items.length > 0);
 
   return (
@@ -43,13 +53,20 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
                 <Fragment key={group.key}>
                   {groupedItems.length > 1 ? (
                     <tr>
-                      <td colSpan={4} className="border-b border-border px-3 py-1.5 text-center text-xs font-semibold text-muted-foreground">
-                        ── {group.label} ──
+                      <td
+                        colSpan={4}
+                        className="border-b border-border px-3 py-1 text-[11px] font-semibold tracking-wider text-muted-foreground"
+                      >
+                        {group.label}
                       </td>
                     </tr>
                   ) : null}
                   {group.items.map((item) => (
-                    <ShoppingItemCard key={item.id} item={item} stores={stores} />
+                    <ShoppingItemCard
+                      key={item.id}
+                      item={item}
+                      stores={stores}
+                    />
                   ))}
                 </Fragment>
               ))}
@@ -57,7 +74,10 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
           </table>
         ) : (
           <div className="p-4">
-            <EmptyState title="未購入の商品はありません" description="右下の追加ボタンから登録できます。" />
+            <EmptyState
+              title="未購入の商品はありません"
+              description="右下の追加ボタンから登録できます。"
+            />
           </div>
         )}
       </section>
@@ -70,7 +90,9 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
           </summary>
           <table className="w-full">
             <tbody>
-              {checkedItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)}
+              {checkedItems.map((item) => (
+                <ShoppingItemCard key={item.id} item={item} stores={stores} />
+              ))}
             </tbody>
           </table>
         </details>
