@@ -78,17 +78,10 @@ export async function deleteRecipe(formData: FormData) {
 export async function toggleRecipeCooked(formData: FormData) {
   const id = requiredString(formData.get("id"));
   const isCooked = requiredString(formData.get("is_cooked")) === "true";
-  const cookedCount = Number(formData.get("cooked_count") ?? 0);
   if (!id) return;
 
   const { supabase } = await getUserId();
-  const { error } = await supabase
-    .from("recipes")
-    .update({
-      is_cooked: !isCooked,
-      cooked_count: !isCooked ? cookedCount + 1 : cookedCount,
-    })
-    .eq("id", id);
+  const { error } = await supabase.from("recipes").update({ is_cooked: !isCooked }).eq("id", id);
 
   if (error) throw new Error(error.message);
   revalidateRecipes();

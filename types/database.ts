@@ -108,7 +108,6 @@ export type Database = {
           memo: string | null;
           is_cooked: boolean;
           is_favorite: boolean;
-          cooked_count: number;
           created_at: string;
           updated_at: string;
         },
@@ -122,7 +121,6 @@ export type Database = {
           memo?: string | null;
           is_cooked?: boolean;
           is_favorite?: boolean;
-          cooked_count?: number;
           created_at?: string;
           updated_at?: string;
         }

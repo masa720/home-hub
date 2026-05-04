@@ -28,7 +28,7 @@ export default async function SettingsPage() {
         </div>
       </section>
       <form action={signOut}>
-        <SubmitButton variant="danger" className="w-full">
+        <SubmitButton variant="ghost" className="w-full text-red-400">
           <LogOut className="size-4" aria-hidden />
           ログアウト
         </SubmitButton>

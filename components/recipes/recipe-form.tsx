@@ -1,5 +1,6 @@
 import { Save } from "lucide-react";
 import { createRecipe, updateRecipe } from "@/app/(app)/recipes/actions";
+import { UrlInput } from "@/components/recipes/url-input";
 import { CancelButton } from "@/components/ui/cancel-button";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -18,9 +19,9 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {recipe ? <input type="hidden" name="id" value={recipe.id} /> : null}
       <Input name="title" placeholder="料理名" defaultValue={recipe?.title ?? ""} required />
       <Textarea name="memo" placeholder="メモ" defaultValue={recipe?.memo ?? ""} />
-      <Input name="url_1" type="url" placeholder="URL 1" defaultValue={recipe?.url_1 ?? ""} />
-      <Input name="url_2" type="url" placeholder="URL 2" defaultValue={recipe?.url_2 ?? ""} />
-      <Input name="url_3" type="url" placeholder="URL 3" defaultValue={recipe?.url_3 ?? ""} />
+      <UrlInput name="url_1" placeholder="URL 1" defaultValue={recipe?.url_1 ?? ""} />
+      <UrlInput name="url_2" placeholder="URL 2" defaultValue={recipe?.url_2 ?? ""} />
+      <UrlInput name="url_3" placeholder="URL 3" defaultValue={recipe?.url_3 ?? ""} />
       <div className="flex justify-end gap-2">
         <CancelButton />
         <SubmitButton>
