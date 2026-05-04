@@ -3,6 +3,7 @@ import { addMealIngredientsToShopping, deleteMealPlan } from "@/app/(app)/meal-p
 import { MealForm } from "@/components/meal-plans/meal-form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import type { MealPlanWithRecipe } from "@/lib/db/meal-plans";
+import { cn } from "@/lib/utils/cn";
 import { formatJaDate, isToday, toDateInputValue } from "@/lib/utils/dates";
 import type { MealType, Recipe } from "@/types/database";
 
@@ -12,12 +13,7 @@ type MealDayCardProps = {
   recipes: Recipe[];
 };
 
-const labels: Record<MealType, string> = {
-  lunch: "ランチ",
-  dinner: "ディナー",
-};
-
-function MealSlot({
+function MealCell({
   mealType,
   plan,
   recipes,
@@ -30,53 +26,47 @@ function MealSlot({
 }) {
   if (!plan) {
     return (
-      <details className="rounded-lg border border-dashed bg-slate-950/40 px-3 py-2">
-        <summary className="cursor-pointer list-none text-sm font-semibold text-muted-foreground">
-          {labels[mealType]}を追加
-        </summary>
-        <div className="mt-3">
-          <MealForm recipes={recipes} date={dateValue} mealType={mealType} />
-        </div>
-      </details>
+      <td className="border-l border-border px-2 py-2 align-top">
+        <details>
+          <summary className="cursor-pointer list-none text-xs text-muted-foreground">＋</summary>
+          <div className="mt-2">
+            <MealForm recipes={recipes} date={dateValue} mealType={mealType} />
+          </div>
+        </details>
+      </td>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-slate-950/45 px-3 py-2">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-normal text-primary">{labels[mealType]}</p>
-          <h3 className="font-semibold text-white">{plan.title}</h3>
-          {plan.recipe ? <p className="text-sm text-muted-foreground">レシピ: {plan.recipe.title}</p> : null}
-          {plan.note ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{plan.note}</p> : null}
-        </div>
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {plan.recipe_id ? (
-          <form action={addMealIngredientsToShopping}>
-            <input type="hidden" name="meal_plan_id" value={plan.id} />
-            <input type="hidden" name="recipe_id" value={plan.recipe_id} />
-            <SubmitButton variant="secondary" size="sm">
-              <ShoppingCart className="size-4" aria-hidden />
-              材料追加
-            </SubmitButton>
-          </form>
-        ) : null}
-        <details className="w-full">
-          <summary className="cursor-pointer list-none text-sm text-muted-foreground">編集</summary>
-          <div className="mt-3">
-            <MealForm recipes={recipes} plan={plan} />
+    <td className="border-l border-border px-2 py-2 align-top">
+      <details className="group">
+        <summary className="cursor-pointer list-none">
+          <span className="text-sm font-medium text-white">{plan.title}</span>
+          {plan.note ? <p className="text-xs text-muted-foreground">{plan.note}</p> : null}
+        </summary>
+        <div className="mt-2 space-y-2">
+          <div className="flex flex-wrap gap-1">
+            {plan.recipe_id ? (
+              <form action={addMealIngredientsToShopping}>
+                <input type="hidden" name="meal_plan_id" value={plan.id} />
+                <input type="hidden" name="recipe_id" value={plan.recipe_id} />
+                <SubmitButton variant="secondary" size="sm" className="h-7 min-h-7 text-xs">
+                  <ShoppingCart className="size-3" aria-hidden />
+                  材料追加
+                </SubmitButton>
+              </form>
+            ) : null}
+            <form action={deleteMealPlan}>
+              <input type="hidden" name="id" value={plan.id} />
+              <SubmitButton variant="ghost" size="sm" className="h-7 min-h-7 text-xs text-red-300">
+                <Trash2 className="size-3" aria-hidden />
+              </SubmitButton>
+            </form>
           </div>
-        </details>
-        <form action={deleteMealPlan} className="ml-auto">
-          <input type="hidden" name="id" value={plan.id} />
-          <SubmitButton variant="ghost" size="sm" className="text-red-300">
-            <Trash2 className="size-4" aria-hidden />
-            削除
-          </SubmitButton>
-        </form>
-      </div>
-    </div>
+          <MealForm recipes={recipes} plan={plan} />
+        </div>
+      </details>
+    </td>
   );
 }
 
@@ -84,19 +74,18 @@ export function MealDayCard({ date, plans, recipes }: MealDayCardProps) {
   const dateValue = toDateInputValue(date);
   const lunch = plans.find((plan) => plan.meal_type === "lunch");
   const dinner = plans.find((plan) => plan.meal_type === "dinner");
+  const today = isToday(date);
 
   return (
-    <article className="rounded-lg border bg-card px-4 py-3">
-      <header className="mb-2 flex items-center justify-between gap-3">
-        <h2 className="font-semibold text-white">{formatJaDate(date)}</h2>
-        {isToday(date) ? (
-          <span className="rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">今日</span>
-        ) : null}
-      </header>
-      <div className="space-y-2">
-        <MealSlot mealType="lunch" plan={lunch} recipes={recipes} dateValue={dateValue} />
-        <MealSlot mealType="dinner" plan={dinner} recipes={recipes} dateValue={dateValue} />
-      </div>
-    </article>
+    <tr className={cn("border-b border-border last:border-b-0", today && "bg-primary/5")}>
+      <td className="w-20 whitespace-nowrap px-3 py-2 align-top">
+        <span className={cn("text-sm font-semibold", today ? "text-primary" : "text-white")}>
+          {formatJaDate(date, "E")}
+        </span>
+        <span className="ml-1 text-xs text-muted-foreground">{formatJaDate(date, "d")}</span>
+      </td>
+      <MealCell mealType="lunch" plan={lunch} recipes={recipes} dateValue={dateValue} />
+      <MealCell mealType="dinner" plan={dinner} recipes={recipes} dateValue={dateValue} />
+    </tr>
   );
 }

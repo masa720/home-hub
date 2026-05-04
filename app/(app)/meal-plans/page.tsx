@@ -25,18 +25,29 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
     <>
       <PageHeader title="献立表" />
       <WeekSelector baseDate={baseDate} />
-      <section className="space-y-3">
-        {weekDays.map((day) => {
-          const dateValue = toDateInputValue(day);
-          return (
-            <MealDayCard
-              key={dateValue}
-              date={day}
-              recipes={recipes}
-              plans={plans.filter((plan) => plan.date === dateValue)}
-            />
-          );
-        })}
+      <section className="overflow-hidden rounded-lg border bg-card">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-border bg-slate-950/40 text-xs font-semibold text-muted-foreground">
+              <th className="px-3 py-1.5 text-left">日付</th>
+              <th className="border-l border-border px-2 py-1.5 text-left">ランチ</th>
+              <th className="border-l border-border px-2 py-1.5 text-left">ディナー</th>
+            </tr>
+          </thead>
+          <tbody>
+            {weekDays.map((day) => {
+              const dateValue = toDateInputValue(day);
+              return (
+                <MealDayCard
+                  key={dateValue}
+                  date={day}
+                  recipes={recipes}
+                  plans={plans.filter((plan) => plan.date === dateValue)}
+                />
+              );
+            })}
+          </tbody>
+        </table>
       </section>
     </>
   );
