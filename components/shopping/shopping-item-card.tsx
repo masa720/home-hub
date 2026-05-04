@@ -53,9 +53,6 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
           label={
             <>
               <span className={cn("text-sm font-medium text-white", item.is_checked && "line-through")}>{item.name}</span>
-              {item.priority === "high" ? (
-                <span className="ml-1.5 rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-red-200">!</span>
-              ) : null}
               {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
             </>
           }

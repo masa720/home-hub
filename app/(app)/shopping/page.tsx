@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { ClearCheckedButton } from "@/components/shopping/clear-checked-button";
@@ -45,22 +44,17 @@ export default async function ShoppingPage({
       <ShoppingAddFab stores={stores} />
       <StoreFilter stores={stores} currentStoreId={store} />
 
-      <section className="rounded-lg border bg-card">
-        {openItems.length > 0 ? (
-          <table className="w-full">
-            <tbody>
-              {groupedItems.map((group) => (
-                <Fragment key={group.key}>
-                  {groupedItems.length > 1 ? (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="border-b border-border px-3 py-1 text-[11px] font-semibold tracking-wider text-muted-foreground"
-                      >
-                        {group.label}
-                      </td>
-                    </tr>
-                  ) : null}
+      {openItems.length > 0 ? (
+        groupedItems.map((group) => (
+          <section key={group.key}>
+            {groupedItems.length > 1 ? (
+              <p className="px-1 pb-1 text-[11px] font-semibold text-muted-foreground">
+                {group.label}
+              </p>
+            ) : null}
+            <div className="rounded-lg border bg-card">
+              <table className="w-full">
+                <tbody>
                   {group.items.map((item) => (
                     <ShoppingItemCard
                       key={item.id}
@@ -68,19 +62,19 @@ export default async function ShoppingPage({
                       stores={stores}
                     />
                   ))}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="p-4">
-            <EmptyState
-              title="未購入の商品はありません"
-              description="右下の追加ボタンから登録できます。"
-            />
-          </div>
-        )}
-      </section>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))
+      ) : (
+        <section className="rounded-lg border bg-card p-4">
+          <EmptyState
+            title="未購入の商品はありません"
+            description="右下の追加ボタンから登録できます。"
+          />
+        </section>
+      )}
 
       {checkedItems.length > 0 ? (
         <details className="rounded-lg border bg-card/70">
