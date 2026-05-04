@@ -28,7 +28,7 @@ begin
   insert into public.expense_categories (user_id, name, color)
   values
     (new.id, '食費', '#34d399'),
-    (new.id, '外食', '#fb7185'),
+    (new.id, '外食費', '#fb7185'),
     (new.id, '日用品', '#38bdf8'),
     (new.id, '交通', '#a78bfa'),
     (new.id, '家賃', '#f59e0b'),

@@ -2,30 +2,28 @@
 
 import { useRef } from "react";
 import { Trash2 } from "lucide-react";
-import { clearCheckedItems } from "@/app/(app)/shopping/actions";
+import { deleteExpense } from "@/app/(app)/expenses/actions";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 
-type ClearCheckedButtonProps = {
-  count: number;
+type DeleteExpenseButtonProps = {
+  expenseId: string;
 };
 
-export function ClearCheckedButton({ count }: ClearCheckedButtonProps) {
+export function DeleteExpenseButton({ expenseId }: DeleteExpenseButtonProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        className="ml-auto shrink-0 px-2 py-1 text-xs font-medium text-red-400 hover:text-red-300"
-        onClick={(e) => {
-          e.preventDefault();
-          dialogRef.current?.showModal();
-        }}
+        variant="ghost"
+        size="sm"
+        className="size-7 min-h-7 min-w-7 p-0 text-red-400 hover:text-red-300"
+        onClick={() => dialogRef.current?.showModal()}
       >
-        <Trash2 className="mr-1 inline size-3" aria-hidden />
-        一括クリア
-      </button>
+        <Trash2 className="size-3.5" aria-hidden />
+      </Button>
 
       <dialog
         ref={dialogRef}
@@ -35,12 +33,13 @@ export function ClearCheckedButton({ count }: ClearCheckedButtonProps) {
         }}
       >
         <div className="p-4">
-          <p className="text-sm font-semibold text-white">購入済み{count}件を削除しますか？</p>
+          <p className="text-sm font-semibold text-white">この記録を削除しますか？</p>
           <div className="mt-4 flex justify-end gap-2">
             <Button type="button" variant="ghost" size="sm" onClick={() => dialogRef.current?.close()}>
               キャンセル
             </Button>
-            <form action={clearCheckedItems}>
+            <form action={deleteExpense}>
+              <input type="hidden" name="id" value={expenseId} />
               <SubmitButton variant="danger" size="sm">
                 削除する
               </SubmitButton>

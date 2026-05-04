@@ -23,7 +23,7 @@ type Table<Row, Insert = Row, Update = Partial<Insert>> = {
   Relationships: Relationship[];
 };
 
-export type Currency = "CAD" | "JPY" | "USD";
+export type Currency = "CAD";
 export type ExpenseType = "expense" | "income";
 export type MealType = "lunch" | "dinner";
 export type Priority = "low" | "normal" | "high";
@@ -157,37 +157,95 @@ export type Database = {
           updated_at?: string;
         }
       >;
-      expense_categories: Table<{
-        id: string;
-        user_id: string;
-        name: string;
-        color: string | null;
-        created_at: string;
-        updated_at: string;
-      }>;
-      payment_methods: Table<{
-        id: string;
-        user_id: string;
-        name: string;
-        created_at: string;
-        updated_at: string;
-      }>;
-      expenses: Table<{
-        id: string;
-        user_id: string;
-        type: ExpenseType;
-        amount: number;
-        currency: Currency;
-        exchange_rate_to_cad: number;
-        amount_cad: number | null;
-        category_id: string | null;
-        payment_method_id: string | null;
-        store_id: string | null;
-        memo: string | null;
-        spent_at: string;
-        created_at: string;
-        updated_at: string;
-      }>;
+      expense_categories: Table<
+        {
+          id: string;
+          user_id: string;
+          name: string;
+          color: string | null;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          user_id: string;
+          name: string;
+          color?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        }
+      >;
+      expenses: Table<
+        {
+          id: string;
+          user_id: string;
+          type: ExpenseType;
+          title: string;
+          amount: number;
+          currency: Currency;
+          exchange_rate_to_cad: number;
+          amount_cad: number | null;
+          category_id: string | null;
+          recurring_expense_id: string | null;
+          entered_by_name: string | null;
+          memo: string | null;
+          spent_at: string;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          user_id: string;
+          type?: ExpenseType;
+          amount: number;
+          currency?: Currency;
+          exchange_rate_to_cad?: number;
+          amount_cad?: number | null;
+          category_id?: string | null;
+          recurring_expense_id?: string | null;
+          entered_by_name?: string | null;
+          memo?: string | null;
+          spent_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        }
+      >;
+      recurring_expenses: Table<
+        {
+          id: string;
+          user_id: string;
+          type: ExpenseType;
+          title: string;
+          amount: number;
+          currency: Currency;
+          exchange_rate_to_cad: number;
+          category_id: string | null;
+          day_of_month: number;
+          start_month: string;
+          end_month: string | null;
+          memo: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        },
+        {
+          id?: string;
+          user_id: string;
+          type?: ExpenseType;
+          title: string;
+          amount: number;
+          currency?: Currency;
+          exchange_rate_to_cad?: number;
+          category_id?: string | null;
+          day_of_month?: number;
+          start_month?: string;
+          end_month?: string | null;
+          memo?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        }
+      >;
     } & Record<string, Table<DbRecord>>;
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -200,3 +258,6 @@ export type Store = Database["public"]["Tables"]["stores"]["Row"];
 export type ShoppingItem = Database["public"]["Tables"]["shopping_items"]["Row"];
 export type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 export type MealPlan = Database["public"]["Tables"]["meal_plans"]["Row"];
+export type ExpenseCategory = Database["public"]["Tables"]["expense_categories"]["Row"];
+export type Expense = Database["public"]["Tables"]["expenses"]["Row"];
+export type RecurringExpense = Database["public"]["Tables"]["recurring_expenses"]["Row"];
