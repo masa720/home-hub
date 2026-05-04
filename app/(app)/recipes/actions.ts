@@ -19,10 +19,9 @@ async function getUserId() {
   return { supabase, userId: user.id };
 }
 
-function revalidateRecipes(recipeId?: string) {
+function revalidateRecipes() {
   revalidatePath("/");
   revalidatePath("/recipes");
-  if (recipeId) revalidatePath(`/recipes/${recipeId}`);
 }
 
 export async function createRecipe(formData: FormData) {
@@ -30,23 +29,19 @@ export async function createRecipe(formData: FormData) {
   if (!title) return;
 
   const { supabase, userId } = await getUserId();
-  const { data, error } = await supabase
-    .from("recipes")
-    .insert({
-      user_id: userId,
-      title,
-      description: optionalString(formData.get("description")),
-      youtube_url: optionalString(formData.get("youtube_url")),
-      url_1: optionalString(formData.get("url_1")),
-      url_2: optionalString(formData.get("url_2")),
-      memo: optionalString(formData.get("memo")),
-    })
-    .select("id")
-    .single();
+  const { error } = await supabase.from("recipes").insert({
+    user_id: userId,
+    title,
+    description: optionalString(formData.get("description")),
+    youtube_url: optionalString(formData.get("youtube_url")),
+    url_1: optionalString(formData.get("url_1")),
+    url_2: optionalString(formData.get("url_2")),
+    memo: optionalString(formData.get("memo")),
+  });
 
   if (error) throw new Error(error.message);
-  revalidateRecipes(data.id);
-  redirect(`/recipes/${data.id}`);
+  revalidateRecipes();
+  redirect("/recipes");
 }
 
 export async function updateRecipe(formData: FormData) {
@@ -68,20 +63,18 @@ export async function updateRecipe(formData: FormData) {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateRecipes(id);
+  revalidateRecipes();
 }
 
 export async function deleteRecipe(formData: FormData) {
   const id = requiredString(formData.get("id"));
-  const redirectAfter = requiredString(formData.get("redirect_after")) === "true";
   if (!id) return;
 
   const { supabase } = await getUserId();
   const { error } = await supabase.from("recipes").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateRecipes(id);
-  if (redirectAfter) redirect("/recipes");
+  revalidateRecipes();
 }
 
 export async function toggleRecipeCooked(formData: FormData) {
@@ -100,7 +93,7 @@ export async function toggleRecipeCooked(formData: FormData) {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateRecipes(id);
+  revalidateRecipes();
 }
 
 export async function toggleRecipeFavorite(formData: FormData) {
@@ -112,5 +105,5 @@ export async function toggleRecipeFavorite(formData: FormData) {
   const { error } = await supabase.from("recipes").update({ is_favorite: !isFavorite }).eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateRecipes(id);
+  revalidateRecipes();
 }

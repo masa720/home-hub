@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ExternalLink, Heart, Trash2, Utensils } from "lucide-react";
 import { deleteRecipe, toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
 import { Button } from "@/components/ui/button";
@@ -12,15 +11,13 @@ type RecipeCardProps = {
 export function RecipeCard({ recipe }: RecipeCardProps) {
   return (
     <article className="rounded-lg border bg-card p-4">
-      <Link href={`/recipes/${recipe.id}`} className="block">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="font-semibold text-white">{recipe.title}</h2>
-            {recipe.description ? <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{recipe.description}</p> : null}
-          </div>
-          {recipe.is_favorite ? <Heart className="size-5 shrink-0 fill-rose-400 text-rose-400" aria-label="お気に入り" /> : null}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-semibold text-white">{recipe.title}</h2>
+          {recipe.description ? <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{recipe.description}</p> : null}
         </div>
-      </Link>
+        {recipe.is_favorite ? <Heart className="size-5 shrink-0 fill-rose-400 text-rose-400" aria-label="お気に入り" /> : null}
+      </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <form action={toggleRecipeCooked}>

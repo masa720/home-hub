@@ -9,9 +9,3 @@ export async function getRecipes(supabase: SupabaseServerClient) {
   if (error) throw new Error(error.message);
   return data;
 }
-
-export async function getRecipeById(supabase: SupabaseServerClient, id: string) {
-  const { data, error } = await supabase.from("recipes").select("*").eq("id", id).single();
-  if (error) throw new Error(error.message);
-  return data;
-}
