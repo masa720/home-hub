@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   DndContext,
   closestCenter,
@@ -40,20 +40,20 @@ function SortableRow({
   isPickerOpen,
   onTogglePicker,
   showBadgePreview,
-  deleteAction,
+  onDelete,
   updateColorAction,
 }: {
   item: SortableItem;
   isPickerOpen: boolean;
   onTogglePicker: (id: string) => void;
   showBadgePreview?: boolean;
-  deleteAction: (formData: FormData) => void;
+  onDelete: (item: SortableItem) => void;
   updateColorAction?: (id: string, color: string) => Promise<void>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const [color, setColor] = useState(item.color ?? "#94a3b8");
+  const [savedColor, setSavedColor] = useState(item.color ?? "#94a3b8");
   const [, startTransition] = useTransition();
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -62,12 +62,23 @@ function SortableRow({
 
   function handleColorChange(newColor: string) {
     setColor(newColor);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      startTransition(async () => {
-        await updateColorAction!(item.id, newColor);
-      });
-    }, 300);
+  }
+
+  function handleColorConfirm() {
+    if (color === savedColor) {
+      onTogglePicker(item.id);
+      return;
+    }
+    setSavedColor(color);
+    startTransition(async () => {
+      await updateColorAction!(item.id, color);
+    });
+    onTogglePicker(item.id);
+  }
+
+  function handleColorCancel() {
+    setColor(savedColor);
+    onTogglePicker(item.id);
   }
 
   return (
@@ -97,17 +108,15 @@ function SortableRow({
           <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: item.color }} />
         ) : null}
         <span className="flex-1 truncate text-sm text-white">{item.name}</span>
-        <form action={deleteAction}>
-          <input type="hidden" name="id" value={item.id} />
-          <Button
-            type="submit"
-            variant="ghost"
-            size="sm"
-            className="size-8 min-h-8 min-w-8 p-0 text-red-400 hover:text-red-300"
-          >
-            <Trash2 className="size-4" aria-hidden />
-          </Button>
-        </form>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="size-8 min-h-8 min-w-8 p-0 text-red-400 hover:text-red-300"
+          onClick={() => onDelete(item)}
+        >
+          <Trash2 className="size-4" aria-hidden />
+        </Button>
       </div>
       {isPickerOpen ? (
         <div className="px-3 pb-2">
@@ -116,6 +125,14 @@ function SortableRow({
             name={showBadgePreview ? item.name : undefined}
             onChange={handleColorChange}
           />
+          <div className="mt-2 flex gap-2">
+            <Button type="button" variant="ghost" size="sm" className="h-7 text-xs" onClick={handleColorCancel}>
+              キャンセル
+            </Button>
+            <Button type="button" variant="secondary" size="sm" className="h-7 text-xs" onClick={handleColorConfirm}>
+              色を保存
+            </Button>
+          </div>
         </div>
       ) : null}
     </div>
@@ -124,8 +141,12 @@ function SortableRow({
 
 export function SortableList({ items: initialItems, showBadgePreview, deleteAction, reorderAction, updateColorAction }: SortableListProps) {
   const [items, setItems] = useState(initialItems);
+  const itemsKey = initialItems.map((i) => i.id).join(",");
+  useEffect(() => { setItems(initialItems); }, [itemsKey]);
   const [openPickerId, setOpenPickerId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [deleteTarget, setDeleteTarget] = useState<SortableItem | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -134,6 +155,21 @@ export function SortableList({ items: initialItems, showBadgePreview, deleteActi
 
   function handleTogglePicker(id: string) {
     setOpenPickerId((prev) => (prev === id ? null : id));
+  }
+
+  function handleDeleteClick(item: SortableItem) {
+    setDeleteTarget(item);
+    dialogRef.current?.showModal();
+  }
+
+  function handleDeleteConfirm() {
+    if (!deleteTarget) return;
+    const formData = new FormData();
+    formData.append("id", deleteTarget.id);
+    deleteAction(formData);
+    setItems((prev) => prev.filter((i) => i.id !== deleteTarget.id));
+    dialogRef.current?.close();
+    setDeleteTarget(null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -151,20 +187,39 @@ export function SortableList({ items: initialItems, showBadgePreview, deleteActi
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((item) => (
-          <SortableRow
-            key={item.id}
-            item={item}
-            isPickerOpen={openPickerId === item.id}
-            onTogglePicker={handleTogglePicker}
-            showBadgePreview={showBadgePreview}
-            deleteAction={deleteAction}
-            updateColorAction={updateColorAction}
-          />
-        ))}
-      </SortableContext>
-    </DndContext>
+    <>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+          {items.map((item) => (
+            <SortableRow
+              key={item.id}
+              item={item}
+              isPickerOpen={openPickerId === item.id}
+              onTogglePicker={handleTogglePicker}
+              showBadgePreview={showBadgePreview}
+              onDelete={handleDeleteClick}
+              updateColorAction={updateColorAction}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
+      <dialog
+        ref={dialogRef}
+        className="rounded-lg border bg-card p-6 text-foreground backdrop:bg-black/50"
+        onClick={(e) => { if (e.target === e.currentTarget) dialogRef.current?.close(); }}
+      >
+        <p className="mb-4 text-sm">
+          「{deleteTarget?.name}」を削除しますか？
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={() => dialogRef.current?.close()}>
+            キャンセル
+          </Button>
+          <Button type="button" variant="danger" size="sm" onClick={handleDeleteConfirm}>
+            削除
+          </Button>
+        </div>
+      </dialog>
+    </>
   );
 }
