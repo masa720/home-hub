@@ -41,11 +41,11 @@ export function ShoppingAddFab({ stores }: ShoppingAddFabProps) {
             <X className="size-5" aria-hidden />
           </Button>
         </div>
-        <div className="p-4" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
+        <div className="p-3" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
           <ShoppingItemForm stores={stores} showCancel />
           <Link
             href="/settings/stores"
-            className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-white"
+            className="mt-2 inline-flex items-center gap-1 px-1 text-xs text-muted-foreground hover:text-white"
             onClick={() => dialogRef.current?.close()}
           >
             <Settings className="size-3" aria-hidden />
