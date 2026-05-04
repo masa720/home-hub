@@ -12,15 +12,15 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <label className="block space-y-2">
-        <span className="text-sm font-medium text-muted-foreground">メールアドレス</span>
+        <span className="text-sm font-medium text-muted-foreground">Email</span>
         <Input name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
       </label>
       <SubmitButton className="w-full">
         <Mail className="size-4" aria-hidden />
-        ログインリンクを送る
+        Send login link
       </SubmitButton>
       {state.message ? (
-        <p className={state.ok ? "text-sm text-primary" : "text-sm text-red-300"}>{state.message}</p>
+        <p className={state.ok ? "text-sm text-success" : "text-sm text-destructive"}>{state.message}</p>
       ) : null}
     </form>
   );

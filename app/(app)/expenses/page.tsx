@@ -4,11 +4,10 @@ import { EmptyState } from "@/components/empty-state";
 export default function ExpensesPage() {
   return (
     <>
-      <PageHeader title="家計簿" />
-      <EmptyState
-        title="家計簿画面はPhase 2で実装します"
-        description="expenses、expense_categories、payment_methodsテーブルと初期データはmigrationに含まれています。"
-      />
+      <PageHeader title="Expenses" />
+      <div className="rounded-2xl bg-card p-4 shadow-card">
+        <EmptyState title="Coming in Phase 2" description="Database tables are ready." />
+      </div>
     </>
   );
 }

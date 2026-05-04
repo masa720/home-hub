@@ -24,9 +24,12 @@ const config: Config = {
         "destructive-foreground": "hsl(var(--destructive-foreground))",
         muted: "hsl(var(--muted))",
         "muted-foreground": "hsl(var(--muted-foreground))",
+        success: "hsl(var(--success))",
       },
       boxShadow: {
-        soft: "0 18px 40px rgba(0, 0, 0, 0.22)",
+        soft: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+        card: "0 1px 3px rgba(0,0,0,0.06)",
+        modal: "0 20px 60px rgba(0,0,0,0.15)",
       },
     },
   },

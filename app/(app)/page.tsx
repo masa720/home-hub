@@ -1,7 +1,6 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
-import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
 import { getCurrentMonthExpenseCadTotal } from "@/lib/db/expenses";
 import { getMealPlans } from "@/lib/db/meal-plans";
 import { getOpenShoppingItems } from "@/lib/db/shopping";
@@ -23,52 +22,49 @@ export default async function HomePage() {
 
   return (
     <>
-      <PageHeader title="ホーム" />
+      <h1 className="text-xl font-bold tracking-tight text-foreground">Today</h1>
 
-      <section className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm font-semibold text-primary">今日のランチ</p>
-          <h2 className="mt-2 text-lg font-bold text-white">{lunch?.title ?? "未登録"}</h2>
-          {lunch?.note ? <p className="mt-2 text-sm text-muted-foreground">{lunch.note}</p> : null}
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm font-semibold text-sky-300">今日のディナー</p>
-          <h2 className="mt-2 text-lg font-bold text-white">{dinner?.title ?? "未登録"}</h2>
-          {dinner?.note ? <p className="mt-2 text-sm text-muted-foreground">{dinner.note}</p> : null}
-        </div>
-      </section>
+      <div className="grid grid-cols-2 gap-3">
+        <Link href="/meal-plans" className="rounded-2xl bg-card p-4 shadow-card active:opacity-70">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Lunch</p>
+          <p className="mt-1.5 text-[15px] font-bold text-foreground">{lunch?.title ?? "..."}</p>
+          {lunch?.note ? <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{lunch.note}</p> : null}
+        </Link>
+        <Link href="/meal-plans" className="rounded-2xl bg-card p-4 shadow-card active:opacity-70">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Dinner</p>
+          <p className="mt-1.5 text-[15px] font-bold text-foreground">{dinner?.title ?? "..."}</p>
+          {dinner?.note ? <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{dinner.note}</p> : null}
+        </Link>
+      </div>
 
-      <section className="rounded-lg border bg-card p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold text-white">未購入の買い物</h2>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/shopping">開く</Link>
-          </Button>
-        </div>
+      <section className="rounded-2xl bg-card p-4 shadow-card">
+        <Link href="/shopping" className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-foreground">Shopping</h2>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
         {openItems.length > 0 ? (
-          <div className="space-y-2">
+          <div className="mt-3 divide-y">
             {openItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-950/45 px-3 py-3">
+              <div key={item.id} className="flex items-center justify-between gap-3 py-2.5">
                 <div className="min-w-0">
-                  <p className="font-medium text-white">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {[item.quantity, item.unit].filter(Boolean).join(" ") || "数量未設定"}
-                    {item.store ? ` ・ ${item.store.name}` : ""}
+                  <p className="text-sm font-medium text-foreground">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {[item.quantity, item.unit].filter(Boolean).join(" ") || ""}
+                    {item.store ? ` ${item.store.name}` : ""}
                   </p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <EmptyState title="未購入の商品はありません" />
+          <EmptyState title="All done" />
         )}
       </section>
 
-      <section className="rounded-lg border bg-card p-4">
-        <p className="text-sm font-semibold text-muted-foreground">今月の支出合計 CAD換算</p>
-        <p className="mt-2 text-3xl font-bold text-white">{formatCurrency(expenseTotal, "CAD")}</p>
-        <p className="mt-2 text-sm text-muted-foreground">家計簿画面の入力UIはPhase 2で追加予定です。</p>
-      </section>
+      <Link href="/expenses" className="block rounded-2xl bg-card p-4 shadow-card active:opacity-70">
+        <p className="text-xs font-medium text-muted-foreground">This month (CAD)</p>
+        <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">{formatCurrency(expenseTotal, "CAD")}</p>
+      </Link>
     </>
   );
 }

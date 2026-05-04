@@ -33,17 +33,17 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <Button
       type="button"
-      variant="secondary"
+      variant="ghost"
       size="sm"
       className={cn(className)}
-      aria-label={nextTheme === "dark" ? "ダークモードに切り替え" : "ライトモードに切り替え"}
+      aria-label={nextTheme === "dark" ? "Dark mode" : "Light mode"}
       onClick={() => {
         setTheme(nextTheme);
         applyTheme(nextTheme);
       }}
     >
       {theme === "dark" ? <Moon className="size-4" aria-hidden /> : <Sun className="size-4" aria-hidden />}
-      {theme === "dark" ? "ダーク" : "ライト"}
+      {theme === "dark" ? "Dark" : "Light"}
     </Button>
   );
 }

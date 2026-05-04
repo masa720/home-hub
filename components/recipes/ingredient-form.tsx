@@ -10,19 +10,19 @@ type IngredientFormProps = {
 
 export function IngredientForm({ recipeId }: IngredientFormProps) {
   return (
-    <form action={createIngredient} className="space-y-3 rounded-lg border bg-card p-4">
+    <form action={createIngredient} className="space-y-3 rounded-2xl bg-card p-4 shadow-card">
       <input type="hidden" name="recipe_id" value={recipeId} />
-      <Input name="name" placeholder="材料名" required />
+      <Input name="name" placeholder="Ingredient name" required />
       <div className="grid grid-cols-2 gap-3">
-        <Input name="quantity" placeholder="数量" />
-        <Input name="unit" placeholder="単位" />
+        <Input name="quantity" placeholder="Qty" />
+        <Input name="unit" placeholder="Unit" />
       </div>
-      <Input name="note" placeholder="メモ" />
+      <Input name="note" placeholder="Note" />
       <div className="flex justify-end gap-2">
         <CancelButton />
-        <SubmitButton variant="secondary">
+        <SubmitButton size="sm">
           <Plus className="size-4" aria-hidden />
-          材料追加
+          Add
         </SubmitButton>
       </div>
     </form>

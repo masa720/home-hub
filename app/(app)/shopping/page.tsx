@@ -20,28 +20,30 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
 
   return (
     <>
-      <PageHeader title="買い物リスト" />
+      <PageHeader title="Shopping" />
       <ShoppingAddFab stores={stores} />
       <StoreFilter stores={stores} currentStoreId={store} />
 
-      <section className="space-y-3">
+      <section className="rounded-2xl bg-card shadow-card">
         {openItems.length > 0 ? (
-          openItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)
+          <div className="divide-y">
+            {openItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)}
+          </div>
         ) : (
-          <EmptyState title="未購入の商品はありません" description="右下の追加ボタンから登録できます。" />
+          <EmptyState title="No items" description="Tap + to add" />
         )}
       </section>
 
-      <details className="rounded-lg border bg-card/70 p-4">
-        <summary className="cursor-pointer list-none font-semibold text-white">購入済み {checkedItems.length}件</summary>
-        <div className="mt-4 space-y-3">
-          {checkedItems.length > 0 ? (
-            checkedItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)
-          ) : (
-            <p className="text-sm text-muted-foreground">購入済みの商品はまだありません。</p>
-          )}
-        </div>
-      </details>
+      {checkedItems.length > 0 ? (
+        <details className="rounded-2xl bg-card shadow-card">
+          <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-muted-foreground">
+            Done ({checkedItems.length})
+          </summary>
+          <div className="divide-y border-t">
+            {checkedItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)}
+          </div>
+        </details>
+      ) : null}
     </>
   );
 }

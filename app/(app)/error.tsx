@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 
 export default function AppError({ error, reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="rounded-lg border border-red-500/40 bg-red-950/30 p-4">
+    <div className="rounded-2xl bg-destructive/10 p-4">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-red-300" aria-hidden />
+        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-destructive" aria-hidden />
         <div className="min-w-0 flex-1">
-          <h2 className="font-semibold text-red-100">エラーが発生しました</h2>
-          <p className="mt-2 break-words text-sm leading-6 text-red-200/80">{error.message}</p>
-          <Button type="button" variant="secondary" size="sm" className="mt-4" onClick={reset}>
-            再読み込み
+          <h2 className="text-sm font-bold text-foreground">Something went wrong</h2>
+          <p className="mt-1 break-words text-xs text-muted-foreground">{error.message}</p>
+          <Button type="button" variant="secondary" size="sm" className="mt-3" onClick={reset}>
+            Retry
           </Button>
         </div>
       </div>

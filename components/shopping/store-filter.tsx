@@ -9,23 +9,23 @@ type StoreFilterProps = {
 
 export function StoreFilter({ stores, currentStoreId }: StoreFilterProps) {
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+    <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none">
       <Link
         href="/shopping"
         className={cn(
-          "shrink-0 rounded-full border px-4 py-2 text-sm font-medium text-muted-foreground",
-          !currentStoreId && "border-primary bg-primary text-primary-foreground",
+          "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
+          !currentStoreId ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
         )}
       >
-        すべて
+        All
       </Link>
       {stores.map((store) => (
         <Link
           key={store.id}
           href={`/shopping?store=${store.id}`}
           className={cn(
-            "shrink-0 rounded-full border px-4 py-2 text-sm font-medium text-muted-foreground",
-            currentStoreId === store.id && "border-primary bg-primary text-primary-foreground",
+            "shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
+            currentStoreId === store.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
           )}
         >
           {store.name}

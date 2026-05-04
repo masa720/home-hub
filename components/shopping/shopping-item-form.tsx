@@ -25,19 +25,19 @@ export function ShoppingItemForm({ stores, item, compact = false, showCancel = f
   ];
 
   return (
-    <form action={action} className="space-y-3 rounded-lg border bg-card p-4">
+    <form action={action} className="space-y-3">
       {item ? <input type="hidden" name="id" value={item.id} /> : null}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_8rem_6rem]">
-        <Input name="name" placeholder="商品名" defaultValue={item?.name ?? ""} required />
-        <Input name="quantity" placeholder="数量" defaultValue={item?.quantity ?? "1"} />
-        <Input name="unit" placeholder="単位" defaultValue={item?.unit ?? "個"} />
+      <Input name="name" placeholder="Item name" defaultValue={item?.name ?? ""} required />
+      <div className="grid grid-cols-2 gap-3">
+        <Input name="quantity" placeholder="Qty" defaultValue={item?.quantity ?? "1"} />
+        <Input name="unit" placeholder="Unit" defaultValue={item?.unit ?? "pc"} />
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <Input
             name="store_name"
             list={datalistId}
-            placeholder="店舗を選択または入力"
+            placeholder="Store"
             defaultValue={item?.store?.name ?? ""}
           />
           <datalist id={datalistId}>
@@ -47,20 +47,20 @@ export function ShoppingItemForm({ stores, item, compact = false, showCancel = f
           </datalist>
         </div>
         <Select name="priority" defaultValue={item?.priority ?? "normal"}>
-          <option value="normal">通常</option>
-          <option value="high">優先</option>
-          <option value="low">低め</option>
+          <option value="normal">Normal</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
         </Select>
       </div>
-      {!compact ? <Textarea name="note" placeholder="メモ" defaultValue={item?.note ?? ""} /> : null}
+      {!compact ? <Textarea name="note" placeholder="Note" defaultValue={item?.note ?? ""} /> : null}
       <div className="flex justify-end gap-2">
         {item || showCancel ? <CancelButton /> : null}
         {item ? (
-          <SubmitButton variant="secondary">更新</SubmitButton>
+          <SubmitButton size="sm">Update</SubmitButton>
         ) : (
-          <SubmitButton>
+          <SubmitButton size="sm">
             <Plus className="size-4" aria-hidden />
-            追加
+            Add
           </SubmitButton>
         )}
       </div>

@@ -24,24 +24,24 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
       }
     : item.store?.color
     ? {
-        backgroundColor: `${item.store.color}22`,
-        borderColor: item.store.color,
+        backgroundColor: `${item.store.color}18`,
+        borderColor: `${item.store.color}40`,
         color: item.store.color,
       }
     : undefined;
 
   return (
-    <article className={cn("rounded-lg border bg-card p-4", item.is_checked && "opacity-65")}>
+    <article className={cn("px-4 py-3", item.is_checked && "opacity-50")}>
       <div className="flex gap-3">
         <form action={toggleShoppingItem}>
           <input type="hidden" name="id" value={item.id} />
           <input type="hidden" name="is_checked" value={String(item.is_checked)} />
           <button
             type="submit"
-            aria-label={item.is_checked ? "未購入に戻す" : "購入済みにする"}
+            aria-label={item.is_checked ? "Uncheck" : "Check"}
             className={cn(
-              "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border-2",
-              item.is_checked ? "border-primary bg-primary text-primary-foreground" : "border-slate-500 bg-slate-950",
+              "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border-2 text-xs transition-colors",
+              item.is_checked ? "border-success bg-success text-white" : "border-border",
             )}
           >
             {item.is_checked ? "✓" : ""}
@@ -49,14 +49,21 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         </form>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <h2 className={cn("font-semibold text-white", item.is_checked && "line-through")}>{item.name}</h2>
-                <span className="text-sm text-muted-foreground">{quantity || "数量未設定"}</span>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className={cn("text-sm font-semibold text-foreground", item.is_checked && "line-through")}>
+                  {item.name}
+                </span>
+                {quantity ? <span className="text-xs text-muted-foreground">{quantity}</span> : null}
+                {item.priority === "high" ? (
+                  <span className="rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] font-bold text-destructive">!</span>
+                ) : null}
+              </div>
+              <div className="mt-0.5 flex items-center gap-2">
                 {item.store ? (
                   <span
-                    className="inline-flex min-h-7 items-center rounded-full border px-3 text-sm font-semibold"
+                    className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold"
                     style={storeBadgeStyle}
                   >
                     {item.store.name}
@@ -64,33 +71,28 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
                 ) : null}
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-              {item.priority === "high" ? (
-                <span className="mr-1 rounded-md bg-red-500/15 px-2 py-1 text-xs font-semibold text-red-200">優先</span>
-              ) : null}
+            <div className="flex shrink-0 items-center">
               <details className="group relative">
                 <summary className="list-none">
-                  <Button asChild variant="ghost" size="sm" className="cursor-pointer text-muted-foreground">
+                  <Button asChild variant="ghost" size="sm" className="size-8 min-h-8 min-w-8 cursor-pointer p-0 text-muted-foreground">
                     <span>
-                      <Pencil className="size-4" aria-hidden />
-                      編集
+                      <Pencil className="size-3.5" aria-hidden />
                     </span>
                   </Button>
                 </summary>
-                <div className="absolute right-0 top-11 z-20 w-[min(22rem,calc(100vw-3rem))] rounded-lg border bg-card p-3 shadow-soft">
+                <div className="absolute right-0 top-9 z-20 w-[min(20rem,calc(100vw-3rem))] rounded-2xl border bg-card p-4 shadow-modal">
                   <ShoppingItemForm stores={stores} item={item} compact />
                 </div>
               </details>
               <form action={deleteShoppingItem}>
                 <input type="hidden" name="id" value={item.id} />
-                <SubmitButton variant="ghost" size="sm" className="text-red-400 hover:text-red-300">
-                  <Trash2 className="size-4" aria-hidden />
-                  削除
+                <SubmitButton variant="ghost" size="sm" className="size-8 min-h-8 min-w-8 p-0 text-muted-foreground">
+                  <Trash2 className="size-3.5" aria-hidden />
                 </SubmitButton>
               </form>
             </div>
           </div>
-          {item.note ? <p className="mt-3 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">{item.note}</p> : null}
+          {item.note ? <p className="mt-1 text-xs text-muted-foreground">{item.note}</p> : null}
         </div>
       </div>
     </article>

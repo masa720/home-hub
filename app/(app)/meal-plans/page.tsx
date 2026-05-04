@@ -23,7 +23,7 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
 
   return (
     <>
-      <PageHeader title="献立表" />
+      <PageHeader title="Meals" />
       <WeekSelector baseDate={baseDate} />
       <section className="space-y-3">
         {weekDays.map((day) => {

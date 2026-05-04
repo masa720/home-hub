@@ -11,37 +11,39 @@ type IngredientListProps = {
 
 export function IngredientList({ recipeId, ingredients }: IngredientListProps) {
   if (ingredients.length === 0) {
-    return <EmptyState title="材料は未登録です" description="下のフォームから材料を追加できます。" />;
+    return <EmptyState title="No ingredients yet" />;
   }
 
   return (
     <section className="space-y-3">
       <form action={addRecipeIngredientsToShopping}>
         <input type="hidden" name="recipe_id" value={recipeId} />
-        <SubmitButton className="w-full">
+        <SubmitButton variant="accent" className="w-full">
           <ShoppingCart className="size-4" aria-hidden />
-          材料を買い物リストへ追加
+          Add all to cart
         </SubmitButton>
       </form>
-      <div className="space-y-2">
-        {ingredients.map((ingredient) => (
-          <div key={ingredient.id} className="flex items-center gap-3 rounded-lg border bg-card p-3">
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-white">{ingredient.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {[ingredient.quantity, ingredient.unit].filter(Boolean).join(" ") || "数量未設定"}
-                {ingredient.note ? ` ・ ${ingredient.note}` : ""}
-              </p>
+      <div className="rounded-2xl bg-card shadow-card">
+        <div className="divide-y">
+          {ingredients.map((ingredient) => (
+            <div key={ingredient.id} className="flex items-center gap-3 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">{ingredient.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {[ingredient.quantity, ingredient.unit].filter(Boolean).join(" ") || ""}
+                  {ingredient.note ? ` / ${ingredient.note}` : ""}
+                </p>
+              </div>
+              <form action={deleteIngredient}>
+                <input type="hidden" name="id" value={ingredient.id} />
+                <input type="hidden" name="recipe_id" value={recipeId} />
+                <SubmitButton variant="ghost" size="icon" className="size-8 min-h-8 min-w-8 text-muted-foreground">
+                  <Trash2 className="size-3.5" aria-hidden />
+                </SubmitButton>
+              </form>
             </div>
-            <form action={deleteIngredient}>
-              <input type="hidden" name="id" value={ingredient.id} />
-              <input type="hidden" name="recipe_id" value={recipeId} />
-              <SubmitButton variant="ghost" size="icon" className="text-red-300">
-                <Trash2 className="size-4" aria-hidden />
-              </SubmitButton>
-            </form>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

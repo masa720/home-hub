@@ -6,10 +6,10 @@ type EmptyStateProps = {
 
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="rounded-lg border border-dashed bg-card/70 p-6 text-center">
-      <p className="font-semibold text-white">{title}</p>
-      {description ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p> : null}
-      {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
+    <div className="py-8 text-center">
+      <p className="text-sm font-medium text-muted-foreground">{title}</p>
+      {description ? <p className="mt-1 text-xs text-muted-foreground/70">{description}</p> : null}
+      {action ? <div className="mt-3 flex justify-center">{action}</div> : null}
     </div>
   );
 }

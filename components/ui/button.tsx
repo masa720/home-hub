@@ -4,19 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils/cn";
 
 const buttonVariants = cva(
-  "inline-flex tap-target items-center justify-center gap-2 rounded-lg text-sm font-semibold transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex tap-target items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors active:opacity-70 disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90",
-        secondary: "bg-muted text-foreground hover:bg-slate-700",
+        default: "bg-primary text-primary-foreground hover:opacity-90",
+        secondary: "bg-muted text-foreground hover:bg-muted/80",
         ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
-        danger: "bg-destructive text-destructive-foreground hover:bg-red-500",
+        danger: "bg-destructive text-destructive-foreground hover:bg-red-600",
         outline: "border bg-transparent text-foreground hover:bg-muted",
+        accent: "bg-accent text-accent-foreground hover:opacity-90",
       },
       size: {
-        default: "h-11 px-4",
-        sm: "h-10 px-3 text-xs",
+        default: "h-11 px-5",
+        sm: "h-9 px-3 text-xs",
         icon: "size-11",
       },
     },
