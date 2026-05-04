@@ -26,7 +26,11 @@ export async function getStores(supabase: SupabaseServerClient) {
 
 export async function getShoppingItems(supabase: SupabaseServerClient) {
   const [itemsResult, storesResult] = await Promise.all([
-    supabase.from("shopping_items").select("*").order("is_checked").order("created_at", { ascending: false }),
+    supabase
+      .from("shopping_items")
+      .select("*")
+      .order("is_checked")
+      .order("created_at", { ascending: false }),
     supabase.from("stores").select("*"),
   ]);
 
@@ -34,10 +38,19 @@ export async function getShoppingItems(supabase: SupabaseServerClient) {
   if (storesResult.error) throw new Error(storesResult.error.message);
 
   const stores = new Map(storesResult.data.map((store) => [store.id, store]));
-  return itemsResult.data.map((item) => ({
-    ...item,
-    store: item.store_id ? stores.get(item.store_id) ?? null : null,
-  })) satisfies ShoppingItemWithStore[];
+  const priorityOrder: Record<string, number> = { high: 0, normal: 1, low: 2 };
+  return itemsResult.data
+    .map((item) => ({
+      ...item,
+      store: item.store_id ? stores.get(item.store_id) ?? null : null,
+    }))
+    .toSorted((a, b) => {
+      if (a.is_checked !== b.is_checked) return a.is_checked ? 1 : -1;
+      const pa = priorityOrder[a.priority] ?? 1;
+      const pb = priorityOrder[b.priority] ?? 1;
+      if (pa !== pb) return pa - pb;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }) satisfies ShoppingItemWithStore[];
 }
 
 export async function getOpenShoppingItems(supabase: SupabaseServerClient, limit = 5) {
