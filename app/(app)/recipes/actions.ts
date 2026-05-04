@@ -32,10 +32,9 @@ export async function createRecipe(formData: FormData) {
   const { error } = await supabase.from("recipes").insert({
     user_id: userId,
     title,
-    description: optionalString(formData.get("description")),
-    youtube_url: optionalString(formData.get("youtube_url")),
     url_1: optionalString(formData.get("url_1")),
     url_2: optionalString(formData.get("url_2")),
+    url_3: optionalString(formData.get("url_3")),
     memo: optionalString(formData.get("memo")),
   });
 
@@ -54,10 +53,9 @@ export async function updateRecipe(formData: FormData) {
     .from("recipes")
     .update({
       title,
-      description: optionalString(formData.get("description")),
-      youtube_url: optionalString(formData.get("youtube_url")),
       url_1: optionalString(formData.get("url_1")),
       url_2: optionalString(formData.get("url_2")),
+      url_3: optionalString(formData.get("url_3")),
       memo: optionalString(formData.get("memo")),
     })
     .eq("id", id);

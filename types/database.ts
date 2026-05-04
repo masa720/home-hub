@@ -102,10 +102,9 @@ export type Database = {
           id: string;
           user_id: string;
           title: string;
-          description: string | null;
-          youtube_url: string | null;
           url_1: string | null;
           url_2: string | null;
+          url_3: string | null;
           memo: string | null;
           is_cooked: boolean;
           is_favorite: boolean;
@@ -117,10 +116,9 @@ export type Database = {
           id?: string;
           user_id: string;
           title: string;
-          description?: string | null;
-          youtube_url?: string | null;
           url_1?: string | null;
           url_2?: string | null;
+          url_3?: string | null;
           memo?: string | null;
           is_cooked?: boolean;
           is_favorite?: boolean;

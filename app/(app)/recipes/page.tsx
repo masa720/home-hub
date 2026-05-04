@@ -27,7 +27,7 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
   const supabase = await createClient();
   const recipes = await getRecipes(supabase);
   const filteredRecipes = recipes.filter((recipe) => {
-    const matchesQuery = !q || recipe.title.toLowerCase().includes(q) || recipe.description?.toLowerCase().includes(q);
+    const matchesQuery = !q || recipe.title.toLowerCase().includes(q) || recipe.memo?.toLowerCase().includes(q);
     const matchesFilter =
       filter === "favorite"
         ? recipe.is_favorite
