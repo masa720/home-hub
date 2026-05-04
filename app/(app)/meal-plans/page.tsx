@@ -29,10 +29,10 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
             <col />
           </colgroup>
           <thead>
-            <tr className="border-b border-border bg-slate-950/40 text-xs font-semibold text-muted-foreground">
-              <th className="px-3 py-1.5 text-left">日付</th>
-              <th className="border-l border-border px-2 py-1.5 text-left">🍳 ランチ</th>
-              <th className="border-l border-border px-2 py-1.5 text-left">🍽️ ディナー</th>
+            <tr className="border-b border-border bg-slate-950/40 text-sm font-semibold text-muted-foreground">
+              <th className="px-3 py-2 text-left">日付</th>
+              <th className="border-l border-border px-2 py-2 text-left">🍳 ランチ</th>
+              <th className="border-l border-border px-2 py-2 text-left">🍽️ ディナー</th>
             </tr>
           </thead>
           <tbody>

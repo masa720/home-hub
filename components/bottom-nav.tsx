@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ListChecks, CalendarDays, BookOpen, WalletCards } from "lucide-react";
+import { Home, ListChecks, CalendarDays, BookOpen, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const navItems = [
@@ -10,7 +10,7 @@ const navItems = [
   { href: "/shopping", label: "Shopping", icon: ListChecks },
   { href: "/meal-plans", label: "Meals", icon: CalendarDays },
   { href: "/recipes", label: "Recipes", icon: BookOpen },
-  { href: "/expenses", label: "Expenses", icon: WalletCards },
+  { href: "/expenses", label: "Expenses", icon: DollarSign },
 ];
 
 export function BottomNav() {

@@ -19,7 +19,7 @@ export function WeekSelector({ baseDate }: WeekSelectorProps) {
         </Link>
       </Button>
       <div className="text-center">
-        <p className="text-sm font-semibold text-white">{formatJaDate(baseDate, "yyyy年M月")}</p>
+        <p className="text-lg font-bold text-white">{formatJaDate(baseDate, "yyyy年M月")}</p>
         <Button asChild variant="ghost" size="sm" className="mt-1 h-8 min-h-8 text-xs">
           <Link href="/meal-plans">今週に戻る</Link>
         </Button>
