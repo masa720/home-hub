@@ -63,10 +63,10 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
           <ShoppingItemForm stores={stores} item={item} showCancel />
         </ShoppingEditModal>
       </td>
-      <td className="w-24 py-2 pr-1 text-right align-middle">
+      <td className="py-2 pr-1 text-right align-middle">
         {item.store ? (
           <span
-            className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
+            className="inline-flex whitespace-nowrap items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
             style={storeBadgeStyle}
           >
             {item.store.name}

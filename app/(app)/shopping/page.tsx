@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { ClearCheckedButton } from "@/components/shopping/clear-checked-button";
@@ -19,6 +20,15 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
   const openItems = filteredItems.filter((item) => !item.is_checked);
   const checkedItems = filteredItems.filter((item) => item.is_checked);
 
+  const priorityGroups = [
+    { key: "high", label: "優先" },
+    { key: "normal", label: "通常" },
+    { key: "low", label: "低い" },
+  ] as const;
+  const groupedItems = priorityGroups
+    .map((group) => ({ ...group, items: openItems.filter((item) => item.priority === group.key) }))
+    .filter((group) => group.items.length > 0);
+
   return (
     <>
       <PageHeader title="買い物リスト" />
@@ -29,7 +39,20 @@ export default async function ShoppingPage({ searchParams }: ShoppingPageProps) 
         {openItems.length > 0 ? (
           <table className="w-full">
             <tbody>
-              {openItems.map((item) => <ShoppingItemCard key={item.id} item={item} stores={stores} />)}
+              {groupedItems.map((group) => (
+                <Fragment key={group.key}>
+                  {groupedItems.length > 1 ? (
+                    <tr>
+                      <td colSpan={4} className="border-b border-border px-3 py-1.5 text-center text-xs font-semibold text-muted-foreground">
+                        ── {group.label} ──
+                      </td>
+                    </tr>
+                  ) : null}
+                  {group.items.map((item) => (
+                    <ShoppingItemCard key={item.id} item={item} stores={stores} />
+                  ))}
+                </Fragment>
+              ))}
             </tbody>
           </table>
         ) : (
