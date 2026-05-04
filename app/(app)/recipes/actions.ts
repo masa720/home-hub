@@ -114,25 +114,3 @@ export async function toggleRecipeFavorite(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidateRecipes(id);
 }
-
-export async function addRecipeToMealPlan(formData: FormData) {
-  const recipeId = requiredString(formData.get("recipe_id"));
-  const title = requiredString(formData.get("title"));
-  const date = requiredString(formData.get("date"));
-  const mealType = requiredString(formData.get("meal_type"));
-  if (!recipeId || !title || !date) return;
-
-  const { supabase, userId } = await getUserId();
-  const { error } = await supabase.from("meal_plans").insert({
-    user_id: userId,
-    recipe_id: recipeId,
-    title,
-    date,
-    meal_type: mealType === "lunch" ? "lunch" : "dinner",
-  });
-
-  if (error) throw new Error(error.message);
-  revalidatePath("/");
-  revalidatePath("/meal-plans");
-  revalidateRecipes(recipeId);
-}

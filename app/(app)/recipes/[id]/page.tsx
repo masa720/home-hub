@@ -1,14 +1,11 @@
 import { ExternalLink, Heart, Trash2, Utensils } from "lucide-react";
 import { notFound } from "next/navigation";
-import { addRecipeToMealPlan, deleteRecipe, toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
+import { deleteRecipe, toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
 import { RecipeForm } from "@/components/recipes/recipe-form";
 import { Button } from "@/components/ui/button";
-import { CancelButton } from "@/components/ui/cancel-button";
-import { Select } from "@/components/ui/select";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { getRecipeById } from "@/lib/db/recipes";
 import { createClient } from "@/lib/supabase/server";
-import { toDateInputValue } from "@/lib/utils/dates";
 
 type RecipeDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -57,29 +54,6 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           ))}
         </div>
       </header>
-
-      <section className="rounded-lg border bg-card p-4">
-        <h2 className="mb-3 font-semibold text-white">献立に追加</h2>
-        <form action={addRecipeToMealPlan} className="grid gap-3 sm:grid-cols-[1fr_10rem_auto]">
-          <input type="hidden" name="recipe_id" value={recipe.id} />
-          <input type="hidden" name="title" value={recipe.title} />
-          <input
-            name="date"
-            type="date"
-            defaultValue={toDateInputValue(new Date())}
-            className="h-12 rounded-lg border bg-slate-950/60 px-3 text-sm"
-            required
-          />
-          <Select name="meal_type" defaultValue="dinner">
-            <option value="lunch">ランチ</option>
-            <option value="dinner">ディナー</option>
-          </Select>
-          <div className="flex gap-2">
-            <CancelButton />
-            <SubmitButton>追加</SubmitButton>
-          </div>
-        </form>
-      </section>
 
       <details className="rounded-lg border bg-card p-4">
         <summary className="cursor-pointer list-none font-semibold text-white">レシピを編集</summary>

@@ -146,7 +146,6 @@ export type Database = {
           date: string;
           meal_type: MealType;
           title: string;
-          recipe_id: string | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -157,7 +156,6 @@ export type Database = {
           date: string;
           meal_type: MealType;
           title: string;
-          recipe_id?: string | null;
           note?: string | null;
           created_at?: string;
           updated_at?: string;

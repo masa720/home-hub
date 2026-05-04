@@ -19,11 +19,6 @@ async function getUserId() {
   return { supabase, userId: user.id };
 }
 
-function normalizeRecipe(value: FormDataEntryValue | null) {
-  const recipeId = optionalString(value);
-  return recipeId === "none" ? null : recipeId;
-}
-
 function mealType(value: FormDataEntryValue | null): MealType {
   return requiredString(value) === "lunch" ? "lunch" : "dinner";
 }
@@ -44,7 +39,6 @@ export async function createMealPlan(formData: FormData) {
     title,
     date,
     meal_type: mealType(formData.get("meal_type")),
-    recipe_id: normalizeRecipe(formData.get("recipe_id")),
     note: optionalString(formData.get("note")),
   });
 
@@ -65,7 +59,6 @@ export async function updateMealPlan(formData: FormData) {
       title,
       date,
       meal_type: mealType(formData.get("meal_type")),
-      recipe_id: normalizeRecipe(formData.get("recipe_id")),
       note: optionalString(formData.get("note")),
     })
     .eq("id", id);

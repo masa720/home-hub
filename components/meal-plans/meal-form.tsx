@@ -5,17 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
-import type { MealPlanWithRecipe } from "@/lib/db/meal-plans";
-import type { MealType, Recipe } from "@/types/database";
+import type { MealPlan, MealType } from "@/types/database";
 
 type MealFormProps = {
-  recipes: Recipe[];
-  plan?: MealPlanWithRecipe;
+  plan?: MealPlan;
   date?: string;
   mealType?: MealType;
 };
 
-export function MealForm({ recipes, plan, date, mealType }: MealFormProps) {
+export function MealForm({ plan, date, mealType }: MealFormProps) {
   const action = plan ? updateMealPlan : createMealPlan;
 
   return (
@@ -29,14 +27,6 @@ export function MealForm({ recipes, plan, date, mealType }: MealFormProps) {
         </Select>
       </div>
       <Input name="title" placeholder="献立名" defaultValue={plan?.title ?? ""} required />
-      <Select name="recipe_id" defaultValue={plan?.recipe_id ?? "none"}>
-        <option value="none">レシピなし</option>
-        {recipes.map((recipe) => (
-          <option key={recipe.id} value={recipe.id}>
-            {recipe.title}
-          </option>
-        ))}
-      </Select>
       <Textarea name="note" placeholder="メモ" defaultValue={plan?.note ?? ""} />
       <div className="flex justify-end gap-2">
         <CancelButton />
