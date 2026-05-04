@@ -49,6 +49,9 @@ export async function getShoppingItems(supabase: SupabaseServerClient) {
       const pa = priorityOrder[a.priority] ?? 1;
       const pb = priorityOrder[b.priority] ?? 1;
       if (pa !== pb) return pa - pb;
+      const sa = a.store?.name ?? "";
+      const sb = b.store?.name ?? "";
+      if (sa !== sb) return sa.localeCompare(sb, "ja");
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }) satisfies ShoppingItemWithStore[];
 }
