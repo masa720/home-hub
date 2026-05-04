@@ -128,7 +128,6 @@ create table public.expenses (
   amount_cad numeric(12,2),
   category_id uuid references public.expense_categories(id) on delete set null,
   payment_method_id uuid references public.payment_methods(id) on delete set null,
-  store_id uuid references public.stores(id) on delete set null,
   memo text,
   spent_at date not null default current_date,
   created_at timestamptz not null default now(),
@@ -320,7 +319,7 @@ begin
   insert into public.expense_categories (user_id, name, color)
   values
     (new.id, '食費', '#34d399'),
-    (new.id, '外食', '#fb7185'),
+    (new.id, '外食費', '#fb7185'),
     (new.id, '日用品', '#38bdf8'),
     (new.id, '交通', '#a78bfa'),
     (new.id, '家賃', '#f59e0b'),

@@ -11,6 +11,9 @@ import {
 } from "date-fns";
 import { ja } from "date-fns/locale";
 
+export const APP_START_MONTH = "2026-01";
+export const APP_START_DATE = "2026-01-01";
+
 export function toDateInputValue(date: Date) {
   return format(date, "yyyy-MM-dd");
 }
