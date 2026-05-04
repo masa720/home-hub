@@ -15,17 +15,19 @@ type ShoppingItemCardProps = {
 export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
   const mappedStoreColor = item.store ? storeColorMap[item.store.name] : undefined;
   const storeBadgeStyle = mappedStoreColor
-    ? {
+    ? ({
         backgroundColor: mappedStoreColor.background,
         borderColor: mappedStoreColor.border,
-        color: mappedStoreColor.text,
-      }
+        "--store-text-light": mappedStoreColor.textLight,
+        "--store-text-dark": mappedStoreColor.textDark,
+      } as React.CSSProperties)
     : item.store?.color
-    ? {
+    ? ({
         backgroundColor: `${item.store.color}22`,
         borderColor: item.store.color,
-        color: item.store.color,
-      }
+        "--store-text-light": item.store.color,
+        "--store-text-dark": item.store.color,
+      } as React.CSSProperties)
     : undefined;
 
   return (
@@ -62,7 +64,7 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
       <td className="py-2 pr-1 text-right align-middle">
         {item.store ? (
           <span
-            className="inline-flex whitespace-nowrap items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
+            className="store-badge inline-flex whitespace-nowrap items-center rounded-full border px-2 py-0.5 text-xs font-semibold"
             style={storeBadgeStyle}
           >
             {item.store.name}
