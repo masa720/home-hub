@@ -92,3 +92,36 @@
     @apply min-h-11 min-w-11;
   }
 }
+
+@property --pie-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes pie-reveal {
+  from {
+    --pie-progress: 0;
+  }
+  to {
+    --pie-progress: 1;
+  }
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.animate-pie-reveal {
+  animation: pie-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-bar {
+  transform-origin: bottom;
+  animation: bar-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

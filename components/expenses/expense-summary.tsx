@@ -153,14 +153,25 @@ export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref 
 
       <div className="border-t px-3 py-4">
         <p className="mb-3 text-center text-sm font-bold text-muted-foreground">支出内訳</p>
-        <div className="mx-auto flex size-48 items-center justify-center rounded-full border shadow-sm sm:size-56">
+        <div className="relative mx-auto size-48 sm:size-56">
           <div
-            className="flex size-full items-center justify-center rounded-full"
+            className="absolute inset-0 rounded-full border shadow-sm"
             style={{
-              background: `radial-gradient(circle, hsl(var(--card)) 0 42%, transparent 43%), conic-gradient(${pieSegments})`,
+              background: `conic-gradient(${pieSegments})`,
+              mask: "radial-gradient(circle, transparent 0 42%, black 43%)",
+              WebkitMask: "radial-gradient(circle, transparent 0 42%, black 43%)",
             }}
             aria-label="カテゴリ別支出グラフ"
-          >
+          />
+          <div
+            className="animate-pie-reveal absolute inset-0 rounded-full"
+            style={{
+              background: `conic-gradient(transparent 0deg, transparent calc(var(--pie-progress) * 360deg), hsl(var(--card)) calc(var(--pie-progress) * 360deg))`,
+              mask: "radial-gradient(circle, transparent 0 42%, black 43%)",
+              WebkitMask: "radial-gradient(circle, transparent 0 42%, black 43%)",
+            }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <p className="text-[11px] font-bold text-muted-foreground">支出</p>
               <p className="text-sm font-bold text-white">{formatCurrency(summary.expenseCadTotal)}</p>
