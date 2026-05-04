@@ -26,7 +26,12 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
       <PageHeader title="献立表" />
       <WeekSelector baseDate={baseDate} />
       <section className="overflow-hidden rounded-lg border bg-card">
-        <table className="w-full">
+        <table className="w-full table-fixed">
+          <colgroup>
+            <col className="w-20" />
+            <col />
+            <col />
+          </colgroup>
           <thead>
             <tr className="border-b border-border bg-slate-950/40 text-xs font-semibold text-muted-foreground">
               <th className="px-3 py-1.5 text-left">日付</th>
