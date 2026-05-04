@@ -41,9 +41,7 @@ export default async function LoginPage() {
       <section className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-soft">
         <LoginForm />
         <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-          メールに届くリンクからログインします。
-          <br />
-          パスワードは不要です。
+          メールアドレスとパスワードでログインします。
         </p>
       </section>
     </main>

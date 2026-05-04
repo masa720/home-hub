@@ -1,32 +1,30 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionState } from "@/lib/utils/form";
 import { requiredString } from "@/lib/utils/form";
 
-export async function signInWithEmail(_prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function signInWithPassword(_prevState: ActionState, formData: FormData): Promise<ActionState> {
   const email = requiredString(formData.get("email"));
+  const password = requiredString(formData.get("password"));
 
   if (!email.includes("@")) {
     return { ok: false, message: "メールアドレスを入力してください。" };
   }
 
-  const supabase = await createClient();
-  const origin = (await headers()).get("origin") ?? "";
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { ok: false, message: error.message };
+  if (!password) {
+    return { ok: false, message: "パスワードを入力してください。" };
   }
 
-  return { ok: true, message: "ログインリンクをメールで送信しました。" };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    return { ok: false, message: "メールアドレスまたはパスワードが正しくありません。" };
+  }
+
+  redirect("/");
 }
 
 export async function signOut() {
