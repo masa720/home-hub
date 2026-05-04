@@ -23,7 +23,7 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
 
   return (
     <>
-      <PageHeader title="献立表" />
+      <PageHeader title="📅 献立表" />
       <WeekSelector baseDate={baseDate} />
       <section className="overflow-hidden rounded-lg border bg-card">
         <table className="w-full table-fixed">
@@ -35,8 +35,8 @@ export default async function MealPlansPage({ searchParams }: MealPlansPageProps
           <thead>
             <tr className="border-b border-border bg-slate-950/40 text-xs font-semibold text-muted-foreground">
               <th className="px-3 py-1.5 text-left">日付</th>
-              <th className="border-l border-border px-2 py-1.5 text-left">ランチ</th>
-              <th className="border-l border-border px-2 py-1.5 text-left">ディナー</th>
+              <th className="border-l border-border px-2 py-1.5 text-left">🍳 ランチ</th>
+              <th className="border-l border-border px-2 py-1.5 text-left">🍽️ ディナー</th>
             </tr>
           </thead>
           <tbody>

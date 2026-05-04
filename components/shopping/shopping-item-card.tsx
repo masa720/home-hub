@@ -49,7 +49,7 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
       </td>
       <td className="py-2 align-middle">
         <ShoppingEditModal
-          title="買い物を編集"
+          title="✏️ 買い物を編集"
           label={
             <>
               <span className={cn("text-sm font-medium text-white", item.is_checked && "line-through")}>{item.name}</span>

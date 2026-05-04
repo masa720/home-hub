@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { BookPlus, CalendarPlus, ListPlus, Menu, PlusCircle, X } from "lucide-react";
+import { BookPlus, CalendarPlus, ListPlus, Menu, PlusCircle, Settings, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 
@@ -38,7 +38,7 @@ export function AppMenu() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 top-12 z-50 w-72 rounded-lg border bg-card p-3 shadow-soft">
-            <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">クイック操作</p>
+            <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">⚡ クイック操作</p>
             <div className="grid gap-2">
               {quickLinks.map((item) => {
                 const Icon = item.icon;
@@ -59,8 +59,19 @@ export function AppMenu() {
               })}
             </div>
             <div className="mt-3 border-t pt-3">
-              <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">表示</p>
+              <p className="px-2 pb-2 text-xs font-semibold text-muted-foreground">その他</p>
               <ThemeToggle className="w-full justify-start" />
+              <Button
+                asChild
+                variant="ghost"
+                className="w-full justify-start text-foreground"
+                onClick={() => setOpen(false)}
+              >
+                <Link href="/settings">
+                  <Settings className="size-4" aria-hidden />
+                  設定
+                </Link>
+              </Button>
             </div>
           </div>
         </>
