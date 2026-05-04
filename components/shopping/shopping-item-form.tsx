@@ -27,8 +27,8 @@ export function ShoppingItemForm({ stores, item, compact = false, showCancel = f
   return (
     <form action={action} className="space-y-3 rounded-lg border bg-card p-4">
       {item ? <input type="hidden" name="id" value={item.id} /> : null}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_8rem_6rem]">
-        <Input name="name" placeholder="商品名" defaultValue={item?.name ?? ""} required />
+      <Input name="name" placeholder="商品名" defaultValue={item?.name ?? ""} required />
+      <div className="grid grid-cols-2 gap-3">
         <Input name="quantity" placeholder="数量" defaultValue={item?.quantity ?? "1"} />
         <Input name="unit" placeholder="単位" defaultValue={item?.unit ?? "個"} />
       </div>

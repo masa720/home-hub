@@ -30,7 +30,7 @@ function MealSlot({
 }) {
   if (!plan) {
     return (
-      <details className="rounded-lg border border-dashed bg-slate-950/40 p-3">
+      <details className="rounded-lg border border-dashed bg-slate-950/40 px-3 py-2">
         <summary className="cursor-pointer list-none text-sm font-semibold text-muted-foreground">
           {labels[mealType]}を追加
         </summary>
@@ -42,16 +42,16 @@ function MealSlot({
   }
 
   return (
-    <div className="rounded-lg border bg-slate-950/45 p-3">
+    <div className="rounded-lg border bg-slate-950/45 px-3 py-2">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-normal text-primary">{labels[mealType]}</p>
-          <h3 className="mt-1 font-semibold text-white">{plan.title}</h3>
-          {plan.recipe ? <p className="mt-1 text-sm text-muted-foreground">レシピ: {plan.recipe.title}</p> : null}
-          {plan.note ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{plan.note}</p> : null}
+          <h3 className="font-semibold text-white">{plan.title}</h3>
+          {plan.recipe ? <p className="text-sm text-muted-foreground">レシピ: {plan.recipe.title}</p> : null}
+          {plan.note ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{plan.note}</p> : null}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         {plan.recipe_id ? (
           <form action={addMealIngredientsToShopping}>
             <input type="hidden" name="meal_plan_id" value={plan.id} />
@@ -86,14 +86,14 @@ export function MealDayCard({ date, plans, recipes }: MealDayCardProps) {
   const dinner = plans.find((plan) => plan.meal_type === "dinner");
 
   return (
-    <article className="rounded-lg border bg-card p-4">
-      <header className="mb-3 flex items-center justify-between gap-3">
+    <article className="rounded-lg border bg-card px-4 py-3">
+      <header className="mb-2 flex items-center justify-between gap-3">
         <h2 className="font-semibold text-white">{formatJaDate(date)}</h2>
         {isToday(date) ? (
           <span className="rounded-md bg-primary px-2 py-1 text-xs font-semibold text-primary-foreground">今日</span>
         ) : null}
       </header>
-      <div className="space-y-3">
+      <div className="space-y-2">
         <MealSlot mealType="lunch" plan={lunch} recipes={recipes} dateValue={dateValue} />
         <MealSlot mealType="dinner" plan={dinner} recipes={recipes} dateValue={dateValue} />
       </div>

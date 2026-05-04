@@ -31,7 +31,7 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
     : undefined;
 
   return (
-    <article className={cn("rounded-lg border bg-card p-4", item.is_checked && "opacity-65")}>
+    <article className={cn("rounded-lg border bg-card px-4 py-3", item.is_checked && "opacity-65")}>
       <div className="flex gap-3">
         <form action={toggleShoppingItem}>
           <input type="hidden" name="id" value={item.id} />
