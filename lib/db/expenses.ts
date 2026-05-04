@@ -1,6 +1,6 @@
 import "server-only";
 
-import { endOfMonth, format } from "date-fns";
+import { differenceInMonths, endOfMonth, format } from "date-fns";
 import { getMonthRange, toDateInputValue } from "@/lib/utils/dates";
 import { isIncomeCategoryName } from "@/lib/utils/expense-categories";
 import type { createClient } from "@/lib/supabase/server";
@@ -272,4 +272,40 @@ export function summarizeExpenses(expenses: ExpenseWithRelations[]): ExpenseSumm
 export async function getCurrentMonthExpenseCadTotal(supabase: SupabaseServerClient) {
   const expenses = await getExpensesForMonth(supabase, new Date());
   return summarizeExpenses(expenses).expenseCadTotal;
+}
+
+export type MonthlyStats = {
+  month: string;
+  label: string;
+  expense: number;
+  income: number;
+  net: number;
+  categoryTotals: ExpenseCategoryTotal[];
+};
+
+export async function getMonthlyStats(
+  supabase: SupabaseServerClient,
+  fromMonth: string,
+  toMonth: string,
+): Promise<MonthlyStats[]> {
+  const start = new Date(`${fromMonth}-01T12:00:00`);
+  const end = new Date(`${toMonth}-01T12:00:00`);
+  const months = differenceInMonths(end, start) + 1;
+  const results: MonthlyStats[] = [];
+
+  for (let i = 0; i < months; i++) {
+    const target = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    const expenses = await getExpensesForMonth(supabase, target);
+    const summary = summarizeExpenses(expenses);
+    results.push({
+      month: format(target, "yyyy-MM"),
+      label: format(target, "M月"),
+      expense: summary.expenseCadTotal,
+      income: summary.incomeCadTotal,
+      net: summary.netCadTotal,
+      categoryTotals: summary.categoryTotals,
+    });
+  }
+
+  return results;
 }

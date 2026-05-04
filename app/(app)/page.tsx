@@ -43,7 +43,7 @@ export default async function HomePage() {
           <span className="text-xs text-muted-foreground">詳細 →</span>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">今月使った額</p>
-        <p className="mt-1 text-3xl font-bold tabular-nums text-red-400">{formatCurrency(summary.expenseCadTotal)}</p>
+        <p className="mt-1 text-3xl font-bold tabular-nums text-white">{formatCurrency(summary.expenseCadTotal)}</p>
         <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm">
           <span className="text-muted-foreground">残り</span>
           <span className="font-bold tabular-nums text-white">{formatCurrency(summary.netCadTotal)}</span>
