@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   DndContext,
   closestCenter,
@@ -141,6 +141,8 @@ function SortableRow({
 
 export function SortableList({ items: initialItems, showBadgePreview, deleteAction, reorderAction, updateColorAction }: SortableListProps) {
   const [items, setItems] = useState(initialItems);
+  const itemsKey = initialItems.map((i) => i.id).join(",");
+  useEffect(() => { setItems(initialItems); }, [itemsKey]);
   const [openPickerId, setOpenPickerId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [deleteTarget, setDeleteTarget] = useState<SortableItem | null>(null);
