@@ -3,7 +3,7 @@ import { MealDayCard } from "@/components/meal-plans/meal-day-card";
 import { WeekSelector } from "@/components/meal-plans/week-selector";
 import { getMealPlans } from "@/lib/db/meal-plans";
 import { createClient } from "@/lib/supabase/server";
-import { getWeekDays, getWeekRange, toDateInputValue } from "@/lib/utils/dates";
+import { getCurrentUtcDate, getWeekDays, getWeekRange, parseDateInputValue, toDateInputValue } from "@/lib/utils/dates";
 
 type MealPlansPageProps = {
   searchParams: Promise<{ week?: string }>;
@@ -11,7 +11,7 @@ type MealPlansPageProps = {
 
 export default async function MealPlansPage({ searchParams }: MealPlansPageProps) {
   const { week } = await searchParams;
-  const baseDate = week ? new Date(`${week}T00:00:00`) : new Date();
+  const baseDate = week ? parseDateInputValue(week) : getCurrentUtcDate();
   const { start, end } = getWeekRange(baseDate);
   const weekDays = getWeekDays(baseDate);
   const supabase = await createClient();

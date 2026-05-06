@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { format } from "date-fns";
 import { ChevronLeft } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { MonthlyChart } from "@/components/expenses/monthly-chart";
@@ -8,15 +7,15 @@ import { StatsRangeSelector } from "@/components/expenses/stats-range-selector";
 import { getMonthlyStats } from "@/lib/db/expenses";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils/currency";
-import { APP_START_MONTH } from "@/lib/utils/dates";
+import { APP_START_MONTH, getCurrentUtcDate, toDateInputValue } from "@/lib/utils/dates";
 
 type StatsPageProps = {
   searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 };
 
 function resolveRange(range: string | undefined, from: string | undefined, to: string | undefined) {
-  const now = new Date();
-  const currentMonth = format(now, "yyyy-MM");
+  const now = getCurrentUtcDate();
+  const currentMonth = toDateInputValue(now).slice(0, 7);
 
   if (range === "custom" && from && to && from <= to) {
     return { key: "custom" as const, from, to };
@@ -28,8 +27,8 @@ function resolveRange(range: string | undefined, from: string | undefined, to: s
 
   const presetMonths = range === "3" ? 3 : 6;
   const key = range === "3" ? ("3" as const) : ("6" as const);
-  const startDate = new Date(now.getFullYear(), now.getMonth() - (presetMonths - 1), 1);
-  return { key, from: format(startDate, "yyyy-MM"), to: currentMonth };
+  const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (presetMonths - 1), 1, 12));
+  return { key, from: toDateInputValue(startDate).slice(0, 7), to: currentMonth };
 }
 
 export default async function ExpenseStatsPage({ searchParams }: StatsPageProps) {

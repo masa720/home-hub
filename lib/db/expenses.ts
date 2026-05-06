@@ -1,7 +1,6 @@
 import "server-only";
 
-import { differenceInMonths, endOfMonth, format } from "date-fns";
-import { getMonthRange, toDateInputValue } from "@/lib/utils/dates";
+import { getCurrentUtcDate, getMonthRange, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
 import { isIncomeCategoryName } from "@/lib/utils/expense-categories";
 import type { createClient } from "@/lib/supabase/server";
 import type { Expense, ExpenseCategory, RecurringExpense } from "@/types/database";
@@ -144,9 +143,11 @@ export async function applyRecurringExpensesForMonth(
     userId = user.id;
   }
 
-  const start = format(baseDate, "yyyy-MM-01");
-  const end = format(endOfMonth(baseDate), "yyyy-MM-dd");
-  const lastDay = endOfMonth(baseDate).getDate();
+  const monthRange = getMonthRange(baseDate);
+  const start = toDateInputValue(monthRange.start);
+  const end = toDateInputValue(monthRange.end);
+  const lastDay = monthRange.end.getUTCDate();
+  const month = toDateInputValue(baseDate).slice(0, 7);
   const categoriesPromise = options.categories
     ? Promise.resolve({ data: options.categories, error: null })
     : supabase.from("expense_categories").select("id, name");
@@ -198,7 +199,7 @@ export async function applyRecurringExpensesForMonth(
       recurring_expense_id: recurring.id,
       entered_by_name: enteredByName,
       memo: recurring.memo ?? recurring.title,
-      spent_at: `${format(baseDate, "yyyy-MM")}-${String(day).padStart(2, "0")}`,
+      spent_at: `${month}-${String(day).padStart(2, "0")}`,
     };
   };
 
@@ -326,7 +327,7 @@ export async function getExpenseTotalsForMonth(
 }
 
 export async function getCurrentMonthExpenseCadTotal(supabase: SupabaseServerClient) {
-  const totals = await getExpenseTotalsForMonth(supabase, new Date());
+  const totals = await getExpenseTotalsForMonth(supabase, getCurrentUtcDate());
   return totals.expenseCadTotal;
 }
 
@@ -344,11 +345,11 @@ export async function getMonthlyStats(
   fromMonth: string,
   toMonth: string,
 ): Promise<MonthlyStats[]> {
-  const start = new Date(`${fromMonth}-01T12:00:00`);
-  const end = new Date(`${toMonth}-01T12:00:00`);
-  const months = differenceInMonths(end, start) + 1;
-  const rangeStart = format(start, "yyyy-MM-01");
-  const rangeEnd = format(endOfMonth(end), "yyyy-MM-dd");
+  const start = parseMonthInputValue(fromMonth);
+  const end = parseMonthInputValue(toMonth);
+  const months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth() + 1;
+  const rangeStart = toDateInputValue(getMonthRange(start).start);
+  const rangeEnd = toDateInputValue(getMonthRange(end).end);
   const [expensesResult, categoriesResult] = await Promise.all([
     supabase
       .from("expenses")
@@ -376,13 +377,13 @@ export async function getMonthlyStats(
 
   const results: MonthlyStats[] = [];
   for (let i = 0; i < months; i++) {
-    const target = new Date(start.getFullYear(), start.getMonth() + i, 1);
-    const month = format(target, "yyyy-MM");
+    const target = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i, 1, 12));
+    const month = toDateInputValue(target).slice(0, 7);
     const expenses = expensesByMonth.get(month) ?? [];
     const summary = summarizeExpenses(expenses);
     results.push({
       month,
-      label: format(target, "M月"),
+      label: `${target.getUTCMonth() + 1}月`,
       expense: summary.expenseCadTotal,
       income: summary.incomeCadTotal,
       net: summary.netCadTotal,

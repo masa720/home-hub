@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { toDateInputValue } from "@/lib/utils/dates";
+import { getCurrentUtcDate, toDateInputValue } from "@/lib/utils/dates";
 import { optionalString, requiredString } from "@/lib/utils/form";
 import type { MealType } from "@/types/database";
 
@@ -26,7 +26,7 @@ function mealType(value: FormDataEntryValue | null): MealType {
 
 function revalidateMeals(date?: string | null) {
   revalidatePath("/meal-plans");
-  if (!date || date === toDateInputValue(new Date())) {
+  if (!date || date === toDateInputValue(getCurrentUtcDate())) {
     revalidatePath("/");
   }
 }
