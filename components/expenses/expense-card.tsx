@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { DeleteExpenseButton } from "@/components/expenses/delete-expense-button";
 import { ExpenseEditModal } from "@/components/expenses/expense-edit-modal";
@@ -22,7 +25,10 @@ function badgeStyle(color: string | null) {
 }
 
 export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
+  const [optimisticDeleted, setOptimisticDeleted] = useState(false);
   const isIncome = expense.type === "income";
+
+  if (optimisticDeleted) return null;
 
   return (
     <tr className="border-b border-border last:border-b-0">
@@ -67,7 +73,11 @@ export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
               showCancel
             />
           </ExpenseEditModal>
-          <DeleteExpenseButton expenseId={expense.id} />
+          <DeleteExpenseButton
+            expenseId={expense.id}
+            onOptimisticDelete={() => setOptimisticDeleted(true)}
+            onDeleteFailed={() => setOptimisticDeleted(false)}
+          />
         </div>
       </td>
     </tr>

@@ -40,13 +40,17 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
     error: userError,
   } = await supabase.auth.getUser();
   if (userError || !user) throw new Error("ログインが必要です。");
-  const profile = await getProfile(supabase, user.id);
-  const defaultEnteredByName = profile.display_name ?? profile.email?.split("@")[0] ?? "Unknown";
-  await applyRecurringExpensesForMonth(supabase, selectedMonth);
-  const [expenses, categories] = await Promise.all([
-    getExpensesForMonth(supabase, selectedMonth),
+  const [profile, categories] = await Promise.all([
+    getProfile(supabase, user.id),
     getExpenseCategories(supabase),
   ]);
+  const defaultEnteredByName = profile.display_name ?? profile.email?.split("@")[0] ?? "Unknown";
+  await applyRecurringExpensesForMonth(supabase, selectedMonth, {
+    userId: user.id,
+    enteredByName: defaultEnteredByName,
+    categories,
+  });
+  const expenses = await getExpensesForMonth(supabase, selectedMonth, categories);
   const summary = summarizeExpenses(expenses);
   const previousMonth = addMonths(selectedMonth, -1);
   const nextMonth = addMonths(selectedMonth, 1);

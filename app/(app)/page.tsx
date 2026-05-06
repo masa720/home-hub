@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
-import { getExpensesForMonth, summarizeExpenses } from "@/lib/db/expenses";
+import { getExpenseTotalsForMonth } from "@/lib/db/expenses";
 import { getMealPlans } from "@/lib/db/meal-plans";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils/currency";
@@ -10,11 +10,14 @@ export default async function HomePage() {
   const supabase = await createClient();
   const today = toDateInputValue(new Date());
   const now = new Date();
-  const [todayPlans, expenses] = await Promise.all([
+  const [todayPlans, summary] = await Promise.all([
     getMealPlans(supabase, today, today),
-    getExpensesForMonth(supabase, now).catch(() => []),
+    getExpenseTotalsForMonth(supabase, now).catch(() => ({
+      expenseCadTotal: 0,
+      incomeCadTotal: 0,
+      netCadTotal: 0,
+    })),
   ]);
-  const summary = summarizeExpenses(expenses);
 
   const lunch = todayPlans.find((plan) => plan.meal_type === "lunch");
   const dinner = todayPlans.find((plan) => plan.meal_type === "dinner");

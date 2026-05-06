@@ -9,31 +9,14 @@ export type ShoppingItemWithStore = ShoppingItem & {
   store: Store | null;
 };
 
-export async function getStores(supabase: SupabaseServerClient) {
-  const { data, error } = await supabase.from("stores").select("*").order("sort_order").order("name");
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function getShoppingItems(supabase: SupabaseServerClient) {
-  const [itemsResult, storesResult] = await Promise.all([
-    supabase
-      .from("shopping_items")
-      .select("*")
-      .order("is_checked")
-      .order("created_at", { ascending: false }),
-    supabase.from("stores").select("*"),
-  ]);
-
-  if (itemsResult.error) throw new Error(itemsResult.error.message);
-  if (storesResult.error) throw new Error(storesResult.error.message);
-
-  const stores = new Map(storesResult.data.map((store) => [store.id, store]));
+function mapItemsToStores(items: ShoppingItem[], stores: Store[]) {
+  const storeById = new Map(stores.map((store) => [store.id, store]));
   const priorityOrder: Record<string, number> = { high: 0, normal: 1, low: 2 };
-  return itemsResult.data
+
+  return items
     .map((item) => ({
       ...item,
-      store: item.store_id ? stores.get(item.store_id) ?? null : null,
+      store: item.store_id ? storeById.get(item.store_id) ?? null : null,
     }))
     .toSorted((a, b) => {
       if (a.is_checked !== b.is_checked) return a.is_checked ? 1 : -1;
@@ -45,6 +28,42 @@ export async function getShoppingItems(supabase: SupabaseServerClient) {
       if (sa !== sb) return sa.localeCompare(sb, "ja");
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }) satisfies ShoppingItemWithStore[];
+}
+
+export async function getStores(supabase: SupabaseServerClient) {
+  const { data, error } = await supabase.from("stores").select("*").order("sort_order").order("name");
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function getShoppingPageData(supabase: SupabaseServerClient, storeId?: string) {
+  let itemsQuery = supabase
+    .from("shopping_items")
+    .select("*")
+    .order("is_checked")
+    .order("created_at", { ascending: false });
+
+  if (storeId) {
+    itemsQuery = itemsQuery.eq("store_id", storeId);
+  }
+
+  const [itemsResult, storesResult] = await Promise.all([
+    itemsQuery,
+    supabase.from("stores").select("*"),
+  ]);
+
+  if (itemsResult.error) throw new Error(itemsResult.error.message);
+  if (storesResult.error) throw new Error(storesResult.error.message);
+
+  return {
+    stores: storesResult.data,
+    items: mapItemsToStores(itemsResult.data, storesResult.data),
+  };
+}
+
+export async function getShoppingItems(supabase: SupabaseServerClient) {
+  const { items } = await getShoppingPageData(supabase);
+  return items;
 }
 
 export async function getOpenShoppingItems(supabase: SupabaseServerClient, limit = 5) {

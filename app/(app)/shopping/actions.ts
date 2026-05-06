@@ -20,7 +20,6 @@ async function getUserId() {
 }
 
 function revalidateShopping() {
-  revalidatePath("/");
   revalidatePath("/shopping");
 }
 

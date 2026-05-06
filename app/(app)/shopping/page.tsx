@@ -4,7 +4,7 @@ import { ClearCheckedButton } from "@/components/shopping/clear-checked-button";
 import { ShoppingAddFab } from "@/components/shopping/shopping-add-fab";
 import { ShoppingItemCard } from "@/components/shopping/shopping-item-card";
 import { StoreFilter } from "@/components/shopping/store-filter";
-import { getShoppingItems, getStores } from "@/lib/db/shopping";
+import { getShoppingPageData } from "@/lib/db/shopping";
 import { createClient } from "@/lib/supabase/server";
 
 type ShoppingPageProps = {
@@ -16,13 +16,7 @@ export default async function ShoppingPage({
 }: ShoppingPageProps) {
   const { store } = await searchParams;
   const supabase = await createClient();
-  const [stores, items] = await Promise.all([
-    getStores(supabase),
-    getShoppingItems(supabase),
-  ]);
-  const filteredItems = store
-    ? items.filter((item) => item.store_id === store)
-    : items;
+  const { stores, items: filteredItems } = await getShoppingPageData(supabase, store);
   const openItems = filteredItems.filter((item) => !item.is_checked);
   const checkedItems = filteredItems.filter((item) => item.is_checked);
 

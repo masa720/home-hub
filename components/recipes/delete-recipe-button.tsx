@@ -1,18 +1,36 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteRecipe } from "@/app/(app)/recipes/actions";
 import { Button } from "@/components/ui/button";
-import { SubmitButton } from "@/components/ui/submit-button";
 
 type DeleteRecipeButtonProps = {
   recipeId: string;
   title: string;
+  onOptimisticDelete?: () => void;
+  onDeleteFailed?: () => void;
 };
 
-export function DeleteRecipeButton({ recipeId, title }: DeleteRecipeButtonProps) {
+export function DeleteRecipeButton({ recipeId, title, onOptimisticDelete, onDeleteFailed }: DeleteRecipeButtonProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [pending, startTransition] = useTransition();
+
+  function handleDelete() {
+    const formData = new FormData();
+    formData.append("id", recipeId);
+    dialogRef.current?.close();
+
+    startTransition(async () => {
+      onOptimisticDelete?.();
+      try {
+        await deleteRecipe(formData);
+      } catch {
+        onDeleteFailed?.();
+        window.alert("削除できませんでした。時間をおいて再試行してください。");
+      }
+    });
+  }
 
   return (
     <>
@@ -39,12 +57,9 @@ export function DeleteRecipeButton({ recipeId, title }: DeleteRecipeButtonProps)
             <Button type="button" variant="ghost" size="sm" onClick={() => dialogRef.current?.close()}>
               キャンセル
             </Button>
-            <form action={deleteRecipe}>
-              <input type="hidden" name="id" value={recipeId} />
-              <SubmitButton variant="danger" size="sm">
-                削除する
-              </SubmitButton>
-            </form>
+            <Button type="button" variant="danger" size="sm" disabled={pending} onClick={handleDelete}>
+              削除する
+            </Button>
           </div>
         </div>
       </dialog>

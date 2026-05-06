@@ -1,18 +1,36 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteShoppingItem } from "@/app/(app)/shopping/actions";
 import { Button } from "@/components/ui/button";
-import { SubmitButton } from "@/components/ui/submit-button";
 
 type DeleteShoppingItemButtonProps = {
   itemId: string;
   name: string;
+  onOptimisticDelete?: () => void;
+  onDeleteFailed?: () => void;
 };
 
-export function DeleteShoppingItemButton({ itemId, name }: DeleteShoppingItemButtonProps) {
+export function DeleteShoppingItemButton({ itemId, name, onOptimisticDelete, onDeleteFailed }: DeleteShoppingItemButtonProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [pending, startTransition] = useTransition();
+
+  function handleDelete() {
+    const formData = new FormData();
+    formData.append("id", itemId);
+    dialogRef.current?.close();
+
+    startTransition(async () => {
+      onOptimisticDelete?.();
+      try {
+        await deleteShoppingItem(formData);
+      } catch {
+        onDeleteFailed?.();
+        window.alert("削除できませんでした。時間をおいて再試行してください。");
+      }
+    });
+  }
 
   return (
     <>
@@ -39,12 +57,9 @@ export function DeleteShoppingItemButton({ itemId, name }: DeleteShoppingItemBut
             <Button type="button" variant="ghost" size="sm" onClick={() => dialogRef.current?.close()}>
               キャンセル
             </Button>
-            <form action={deleteShoppingItem}>
-              <input type="hidden" name="id" value={itemId} />
-              <SubmitButton variant="danger" size="sm">
-                削除する
-              </SubmitButton>
-            </form>
+            <Button type="button" variant="danger" size="sm" disabled={pending} onClick={handleDelete}>
+              削除する
+            </Button>
           </div>
         </div>
       </dialog>

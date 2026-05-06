@@ -1,17 +1,35 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteExpense } from "@/app/(app)/expenses/actions";
 import { Button } from "@/components/ui/button";
-import { SubmitButton } from "@/components/ui/submit-button";
 
 type DeleteExpenseButtonProps = {
   expenseId: string;
+  onOptimisticDelete?: () => void;
+  onDeleteFailed?: () => void;
 };
 
-export function DeleteExpenseButton({ expenseId }: DeleteExpenseButtonProps) {
+export function DeleteExpenseButton({ expenseId, onOptimisticDelete, onDeleteFailed }: DeleteExpenseButtonProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [pending, startTransition] = useTransition();
+
+  function handleDelete() {
+    const formData = new FormData();
+    formData.append("id", expenseId);
+    dialogRef.current?.close();
+
+    startTransition(async () => {
+      onOptimisticDelete?.();
+      try {
+        await deleteExpense(formData);
+      } catch {
+        onDeleteFailed?.();
+        window.alert("削除できませんでした。時間をおいて再試行してください。");
+      }
+    });
+  }
 
   return (
     <>
@@ -38,12 +56,9 @@ export function DeleteExpenseButton({ expenseId }: DeleteExpenseButtonProps) {
             <Button type="button" variant="ghost" size="sm" onClick={() => dialogRef.current?.close()}>
               キャンセル
             </Button>
-            <form action={deleteExpense}>
-              <input type="hidden" name="id" value={expenseId} />
-              <SubmitButton variant="danger" size="sm">
-                削除する
-              </SubmitButton>
-            </form>
+            <Button type="button" variant="danger" size="sm" disabled={pending} onClick={handleDelete}>
+              削除する
+            </Button>
           </div>
         </div>
       </dialog>
