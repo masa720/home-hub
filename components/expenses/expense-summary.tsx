@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { endOfMonth, format } from "date-fns";
+import { MonthPicker } from "@/components/expenses/month-picker";
 import {
   Baby,
   BriefcaseBusiness,
@@ -22,7 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
-import { formatJaDate } from "@/lib/utils/dates";
+import { APP_START_MONTH, formatJaDate } from "@/lib/utils/dates";
 import type { ExpenseSummaryData } from "@/lib/db/expenses";
 
 type ExpenseSummaryProps = {
@@ -102,9 +103,10 @@ export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref 
             </span>
           )}
           <div className="min-w-0 text-center">
-            <p className="truncate text-3xl font-bold tracking-normal text-white">
-              {formatJaDate(selectedMonth, "yyyy年M月")}
-            </p>
+            <MonthPicker
+              selectedMonth={format(selectedMonth, "yyyy-MM")}
+              startMonth={APP_START_MONTH}
+            />
             <p className="mt-0.5 text-sm font-semibold text-muted-foreground">
               {monthStart}〜{monthEnd}
             </p>
