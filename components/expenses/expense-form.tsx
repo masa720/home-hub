@@ -3,9 +3,10 @@ import { createExpense, updateExpense } from "@/app/(app)/expenses/actions";
 import { ExpenseCategoryFields } from "@/components/expenses/expense-category-fields";
 import { CancelButton } from "@/components/ui/cancel-button";
 import { Input } from "@/components/ui/input";
+import { LocalDateInput } from "@/components/ui/local-date-input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_START_DATE, toDateInputValue } from "@/lib/utils/dates";
+import { APP_START_DATE } from "@/lib/utils/dates";
 import type { ExpenseWithRelations } from "@/lib/db/expenses";
 import type { ExpenseCategory } from "@/types/database";
 
@@ -28,11 +29,10 @@ export function ExpenseForm({
     <form action={action} className="space-y-3 rounded-lg border bg-card p-4">
       {expense ? <input type="hidden" name="id" value={expense.id} /> : null}
       <div>
-        <Input
+        <LocalDateInput
           name="spent_at"
-          type="date"
           min={APP_START_DATE}
-          defaultValue={expense?.spent_at ?? toDateInputValue(new Date())}
+          defaultValue={expense?.spent_at}
           aria-label="日付"
           required
         />

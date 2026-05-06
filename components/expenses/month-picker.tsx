@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 
 type MonthPickerProps = {
   selectedMonth: string; // "yyyy-MM"
@@ -35,7 +34,6 @@ function generateMonthOptions(startMonth: string) {
 export function MonthPicker({ selectedMonth, startMonth }: MonthPickerProps) {
   const router = useRouter();
   const options = generateMonthOptions(startMonth);
-  const currentMonth = format(new Date(), "yyyy-MM");
 
   return (
     <div className="min-w-0 text-center">

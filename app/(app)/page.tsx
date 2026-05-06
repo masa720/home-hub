@@ -4,12 +4,12 @@ import { getExpenseTotalsForMonth } from "@/lib/db/expenses";
 import { getMealPlans } from "@/lib/db/meal-plans";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils/currency";
-import { formatJaDate, toDateInputValue } from "@/lib/utils/dates";
+import { formatJaDate, getCurrentUtcDate, toDateInputValue } from "@/lib/utils/dates";
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const today = toDateInputValue(new Date());
-  const now = new Date();
+  const now = getCurrentUtcDate();
+  const today = toDateInputValue(now);
   const [todayPlans, summary] = await Promise.all([
     getMealPlans(supabase, today, today),
     getExpenseTotalsForMonth(supabase, now).catch(() => ({

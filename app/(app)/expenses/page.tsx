@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { addMonths, format } from "date-fns";
 import { BarChart3, Settings } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { ExpenseAddFab } from "@/components/expenses/expense-add-fab";
@@ -15,20 +14,24 @@ import {
 } from "@/lib/db/expenses";
 import { getProfile } from "@/lib/db/profiles";
 import { createClient } from "@/lib/supabase/server";
-import { APP_START_MONTH } from "@/lib/utils/dates";
+import { APP_START_MONTH, getCurrentUtcDate, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
 
 type ExpensesPageProps = {
   searchParams: Promise<{ month?: string }>;
 };
 
 function parseMonth(value: string | undefined) {
-  if (!value) return new Date();
+  if (!value) return getCurrentUtcDate();
   if (!/^\d{4}-\d{2}$/.test(value) || value < APP_START_MONTH) notFound();
-  return new Date(`${value}-01T12:00:00`);
+  return parseMonthInputValue(value);
 }
 
 function monthHref(date: Date) {
-  return `/expenses?month=${format(date, "yyyy-MM")}`;
+  return `/expenses?month=${toDateInputValue(date).slice(0, 7)}`;
+}
+
+function shiftMonth(date: Date, amount: number) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1, 12));
 }
 
 export default async function ExpensesPage({ searchParams }: ExpensesPageProps) {
@@ -52,9 +55,9 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
   });
   const expenses = await getExpensesForMonth(supabase, selectedMonth, categories);
   const summary = summarizeExpenses(expenses);
-  const previousMonth = addMonths(selectedMonth, -1);
-  const nextMonth = addMonths(selectedMonth, 1);
-  const canGoPrevious = format(previousMonth, "yyyy-MM") >= APP_START_MONTH;
+  const previousMonth = shiftMonth(selectedMonth, -1);
+  const nextMonth = shiftMonth(selectedMonth, 1);
+  const canGoPrevious = toDateInputValue(previousMonth).slice(0, 7) >= APP_START_MONTH;
 
   return (
     <>

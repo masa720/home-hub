@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { endOfMonth, format } from "date-fns";
 import { MonthPicker } from "@/components/expenses/month-picker";
 import {
   Baby,
@@ -23,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
-import { APP_START_MONTH, formatJaDate } from "@/lib/utils/dates";
+import { APP_START_MONTH, formatJaDate, getCurrentUtcDate, getMonthRange, toDateInputValue } from "@/lib/utils/dates";
 import type { ExpenseSummaryData } from "@/lib/db/expenses";
 
 type ExpenseSummaryProps = {
@@ -83,7 +82,9 @@ export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref 
           .values.join(", ")
       : "#64748b 0% 100%";
   const monthStart = formatJaDate(selectedMonth, "M月1日");
-  const monthEnd = formatJaDate(endOfMonth(selectedMonth), "M月d日");
+  const monthEnd = formatJaDate(getMonthRange(selectedMonth).end, "M月d日");
+  const selectedMonthValue = toDateInputValue(selectedMonth).slice(0, 7);
+  const currentMonthValue = toDateInputValue(getCurrentUtcDate()).slice(0, 7);
 
   return (
     <section className="overflow-hidden rounded-lg border bg-card">
@@ -104,13 +105,13 @@ export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref 
           )}
           <div className="min-w-0 text-center">
             <MonthPicker
-              selectedMonth={format(selectedMonth, "yyyy-MM")}
+              selectedMonth={selectedMonthValue}
               startMonth={APP_START_MONTH}
             />
             <p className="mt-0.5 text-sm font-semibold text-muted-foreground">
               {monthStart}〜{monthEnd}
             </p>
-            {format(selectedMonth, "yyyy-MM") !== format(new Date(), "yyyy-MM") ? (
+            {selectedMonthValue !== currentMonthValue ? (
               <Link
                 href="/expenses"
                 className="mt-1 inline-flex rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground hover:text-foreground"
