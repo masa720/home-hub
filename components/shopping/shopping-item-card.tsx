@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { toggleShoppingItem } from "@/app/(app)/shopping/actions";
 import { DeleteShoppingItemButton } from "@/components/shopping/delete-shopping-item-button";
 import { ShoppingEditModal } from "@/components/shopping/shopping-edit-modal";
@@ -16,6 +16,7 @@ type ShoppingItemCardProps = {
 };
 
 export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
+  const [optimisticDeleted, setOptimisticDeleted] = useState(false);
   const [optimisticChecked, setOptimisticChecked] = useOptimistic(item.is_checked);
   const [, startTransition] = useTransition();
 
@@ -46,6 +47,8 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
       await toggleShoppingItem(formData);
     });
   }
+
+  if (optimisticDeleted) return null;
 
   return (
     <tr className={cn("border-b border-border last:border-b-0", optimisticChecked && "opacity-50")}>
@@ -86,7 +89,12 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         ) : null}
       </td>
       <td className="w-8 py-2 pr-2 align-middle">
-        <DeleteShoppingItemButton itemId={item.id} name={item.name} />
+        <DeleteShoppingItemButton
+          itemId={item.id}
+          name={item.name}
+          onOptimisticDelete={() => setOptimisticDeleted(true)}
+          onDeleteFailed={() => setOptimisticDeleted(false)}
+        />
       </td>
     </tr>
   );

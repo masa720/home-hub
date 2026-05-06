@@ -21,10 +21,10 @@ async function getUserId() {
   return { supabase, userId: user.id };
 }
 
-function revalidateExpenses() {
+function revalidateExpenses({ settings = false } = {}) {
   revalidatePath("/");
   revalidatePath("/expenses");
-  revalidatePath("/expenses/settings");
+  if (settings) revalidatePath("/expenses/settings");
 }
 
 function parseExpenseType(value: FormDataEntryValue | null): ExpenseType {
@@ -124,7 +124,7 @@ export async function createRecurringExpense(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  revalidateExpenses();
+  revalidateExpenses({ settings: true });
 }
 
 export async function updateRecurringExpense(formData: FormData) {
@@ -154,7 +154,7 @@ export async function updateRecurringExpense(formData: FormData) {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateExpenses();
+  revalidateExpenses({ settings: true });
 }
 
 export async function deleteRecurringExpense(formData: FormData) {
@@ -165,7 +165,7 @@ export async function deleteRecurringExpense(formData: FormData) {
   const { error } = await supabase.from("recurring_expenses").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateExpenses();
+  revalidateExpenses({ settings: true });
 }
 
 export async function toggleRecurringExpense(formData: FormData) {
@@ -177,7 +177,7 @@ export async function toggleRecurringExpense(formData: FormData) {
   const { error } = await supabase.from("recurring_expenses").update({ is_active: !isActive }).eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateExpenses();
+  revalidateExpenses({ settings: true });
 }
 
 export async function setRecurringExpenseActive(id: string, isActive: boolean) {
@@ -187,7 +187,7 @@ export async function setRecurringExpenseActive(id: string, isActive: boolean) {
   const { error } = await supabase.from("recurring_expenses").update({ is_active: isActive }).eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateExpenses();
+  revalidateExpenses({ settings: true });
 }
 
 export async function updateExpense(formData: FormData) {

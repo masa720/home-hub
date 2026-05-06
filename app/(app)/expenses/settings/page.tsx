@@ -2,15 +2,12 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { RecurringExpenseSettings } from "@/components/expenses/recurring-expense-settings";
-import { getExpenseCategories, getRecurringExpenses } from "@/lib/db/expenses";
+import { getRecurringExpenseSettingsData } from "@/lib/db/expenses";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ExpenseSettingsPage() {
   const supabase = await createClient();
-  const [categories, recurringExpenses] = await Promise.all([
-    getExpenseCategories(supabase),
-    getRecurringExpenses(supabase),
-  ]);
+  const { categories, recurringExpenses } = await getRecurringExpenseSettingsData(supabase);
 
   return (
     <>

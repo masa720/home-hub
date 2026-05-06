@@ -37,6 +37,7 @@ function MealCell({
         <div className="mb-3 flex flex-wrap gap-1">
           <form action={deleteMealPlan}>
             <input type="hidden" name="id" value={plan.id} />
+            <input type="hidden" name="date" value={plan.date} />
             <SubmitButton variant="ghost" size="sm" className="h-7 min-h-7 text-xs text-red-300">
               <Trash2 className="size-3" aria-hidden />
               削除

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { toDateInputValue } from "@/lib/utils/dates";
 import { optionalString, requiredString } from "@/lib/utils/form";
 import type { MealType } from "@/types/database";
 
@@ -23,9 +24,11 @@ function mealType(value: FormDataEntryValue | null): MealType {
   return requiredString(value) === "lunch" ? "lunch" : "dinner";
 }
 
-function revalidateMeals() {
-  revalidatePath("/");
+function revalidateMeals(date?: string | null) {
   revalidatePath("/meal-plans");
+  if (!date || date === toDateInputValue(new Date())) {
+    revalidatePath("/");
+  }
 }
 
 export async function createMealPlan(formData: FormData) {
@@ -43,7 +46,7 @@ export async function createMealPlan(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  revalidateMeals();
+  revalidateMeals(date);
 }
 
 export async function updateMealPlan(formData: FormData) {
@@ -64,7 +67,7 @@ export async function updateMealPlan(formData: FormData) {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateMeals();
+  revalidateMeals(date);
 }
 
 export async function deleteMealPlan(formData: FormData) {
@@ -75,5 +78,5 @@ export async function deleteMealPlan(formData: FormData) {
   const { error } = await supabase.from("meal_plans").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateMeals();
+  revalidateMeals(optionalString(formData.get("date")));
 }

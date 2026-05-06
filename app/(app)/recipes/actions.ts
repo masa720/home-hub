@@ -20,7 +20,6 @@ async function getUserId() {
 }
 
 function revalidateRecipes() {
-  revalidatePath("/");
   revalidatePath("/recipes");
 }
 

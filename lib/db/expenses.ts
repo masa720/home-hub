@@ -31,34 +31,50 @@ export type ExpenseCategoryTotal = {
   percent: number;
 };
 
+function mapExpensesToCategories(expenses: Expense[], categories: ExpenseCategory[]) {
+  const categoryById = new Map(categories.map((category) => [category.id, category]));
+
+  return expenses.map((expense) => ({
+    ...expense,
+    category: expense.category_id ? categoryById.get(expense.category_id) ?? null : null,
+  })) satisfies ExpenseWithRelations[];
+}
+
 export async function getExpenseCategories(supabase: SupabaseServerClient) {
   const { data, error } = await supabase.from("expense_categories").select("*").order("sort_order").order("name");
   if (error) throw new Error(error.message);
   return data;
 }
 
-export async function getExpensesForMonth(supabase: SupabaseServerClient, baseDate: Date) {
+export async function getExpensesForMonth(
+  supabase: SupabaseServerClient,
+  baseDate: Date,
+  categories?: ExpenseCategory[],
+) {
   const { start, end } = getMonthRange(baseDate);
+  const expensesQuery = supabase
+    .from("expenses")
+    .select("*")
+    .gte("spent_at", toDateInputValue(start))
+    .lte("spent_at", toDateInputValue(end))
+    .order("spent_at", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  if (categories) {
+    const expensesResult = await expensesQuery;
+    if (expensesResult.error) throw new Error(expensesResult.error.message);
+    return mapExpensesToCategories(expensesResult.data, categories);
+  }
+
   const [expensesResult, categoriesResult] = await Promise.all([
-    supabase
-      .from("expenses")
-      .select("*")
-      .gte("spent_at", toDateInputValue(start))
-      .lte("spent_at", toDateInputValue(end))
-      .order("spent_at", { ascending: false })
-      .order("created_at", { ascending: false }),
+    expensesQuery,
     supabase.from("expense_categories").select("*"),
   ]);
 
   if (expensesResult.error) throw new Error(expensesResult.error.message);
   if (categoriesResult.error) throw new Error(categoriesResult.error.message);
 
-  const categories = new Map(categoriesResult.data.map((category) => [category.id, category]));
-
-  return expensesResult.data.map((expense) => ({
-    ...expense,
-    category: expense.category_id ? categories.get(expense.category_id) ?? null : null,
-  })) satisfies ExpenseWithRelations[];
+  return mapExpensesToCategories(expensesResult.data, categoriesResult.data);
 }
 
 export async function getRecurringExpenses(supabase: SupabaseServerClient) {
@@ -83,34 +99,78 @@ export async function getRecurringExpenses(supabase: SupabaseServerClient) {
   })) satisfies RecurringExpenseWithRelations[];
 }
 
-export async function applyRecurringExpensesForMonth(supabase: SupabaseServerClient, baseDate: Date) {
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) throw new Error("ログインが必要です。");
+export async function getRecurringExpenseSettingsData(supabase: SupabaseServerClient) {
+  const [recurringResult, categoriesResult] = await Promise.all([
+    supabase
+      .from("recurring_expenses")
+      .select("*")
+      .order("day_of_month")
+      .order("created_at")
+      .order("id"),
+    supabase.from("expense_categories").select("*").order("sort_order").order("name"),
+  ]);
+
+  if (recurringResult.error) throw new Error(recurringResult.error.message);
+  if (categoriesResult.error) throw new Error(categoriesResult.error.message);
+
+  const categories = categoriesResult.data;
+  const categoryById = new Map(categories.map((category) => [category.id, category]));
+  const recurringExpenses = recurringResult.data.map((recurring) => ({
+    ...recurring,
+    category: recurring.category_id ? categoryById.get(recurring.category_id) ?? null : null,
+  })) satisfies RecurringExpenseWithRelations[];
+
+  return { categories, recurringExpenses };
+}
+
+type ApplyRecurringExpensesOptions = {
+  userId?: string;
+  enteredByName?: string;
+  categories?: Pick<ExpenseCategory, "id" | "name">[];
+};
+
+export async function applyRecurringExpensesForMonth(
+  supabase: SupabaseServerClient,
+  baseDate: Date,
+  options: ApplyRecurringExpensesOptions = {},
+) {
+  let userId = options.userId;
+  if (!userId) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("ログインが必要です。");
+    userId = user.id;
+  }
 
   const start = format(baseDate, "yyyy-MM-01");
   const end = format(endOfMonth(baseDate), "yyyy-MM-dd");
   const lastDay = endOfMonth(baseDate).getDate();
+  const categoriesPromise = options.categories
+    ? Promise.resolve({ data: options.categories, error: null })
+    : supabase.from("expense_categories").select("id, name");
+  const profilePromise = options.enteredByName
+    ? Promise.resolve({ data: null, error: null })
+    : supabase.from("profiles").select("display_name,email").eq("id", userId).maybeSingle();
 
   const [recurringResult, existingResult, categoriesResult, profileResult] = await Promise.all([
     supabase
       .from("recurring_expenses")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("is_active", true)
       .lte("start_month", start)
       .or(`end_month.is.null,end_month.gte.${start}`),
     supabase
       .from("expenses")
       .select("id, recurring_expense_id, type, amount, category_id, memo, spent_at, entered_by_name")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("spent_at", start)
       .lte("spent_at", end)
       .not("recurring_expense_id", "is", null),
-    supabase.from("expense_categories").select("id, name"),
-    supabase.from("profiles").select("display_name,email").eq("id", user.id).maybeSingle(),
+    categoriesPromise,
+    profilePromise,
   ]);
 
   if (recurringResult.error) throw new Error(recurringResult.error.message);
@@ -119,7 +179,7 @@ export async function applyRecurringExpensesForMonth(supabase: SupabaseServerCli
   if (profileResult.error) throw new Error(profileResult.error.message);
 
   const categories = new Map(categoriesResult.data.map((category) => [category.id, category]));
-  const enteredByName = profileResult.data?.display_name ?? profileResult.data?.email?.split("@")[0] ?? "Unknown";
+  const enteredByName = options.enteredByName ?? profileResult.data?.display_name ?? profileResult.data?.email?.split("@")[0] ?? "Unknown";
   const existingByRecurringId = new Map(
     existingResult.data
       .filter((expense) => expense.recurring_expense_id)
@@ -129,7 +189,7 @@ export async function applyRecurringExpensesForMonth(supabase: SupabaseServerCli
     const day = Math.min(recurring.day_of_month, lastDay);
     const type = isIncomeCategoryName(categories.get(recurring.category_id ?? "")?.name) ? "income" : recurring.type;
     return {
-      user_id: user.id,
+      user_id: userId,
       type,
       amount: recurring.amount,
       currency: "CAD" as const,
@@ -234,9 +294,40 @@ export function summarizeExpenses(expenses: ExpenseWithRelations[]): ExpenseSumm
   };
 }
 
+export async function getExpenseTotalsForMonth(
+  supabase: SupabaseServerClient,
+  baseDate: Date,
+): Promise<Pick<ExpenseSummaryData, "expenseCadTotal" | "incomeCadTotal" | "netCadTotal">> {
+  const { start, end } = getMonthRange(baseDate);
+  const { data, error } = await supabase
+    .from("expenses")
+    .select("type, amount_cad")
+    .gte("spent_at", toDateInputValue(start))
+    .lte("spent_at", toDateInputValue(end));
+
+  if (error) throw new Error(error.message);
+
+  let expenseCadTotal = 0;
+  let incomeCadTotal = 0;
+  for (const expense of data) {
+    const amountCad = Number(expense.amount_cad ?? 0);
+    if (expense.type === "income") {
+      incomeCadTotal += amountCad;
+    } else {
+      expenseCadTotal += amountCad;
+    }
+  }
+
+  return {
+    expenseCadTotal,
+    incomeCadTotal,
+    netCadTotal: incomeCadTotal - expenseCadTotal,
+  };
+}
+
 export async function getCurrentMonthExpenseCadTotal(supabase: SupabaseServerClient) {
-  const expenses = await getExpensesForMonth(supabase, new Date());
-  return summarizeExpenses(expenses).expenseCadTotal;
+  const totals = await getExpenseTotalsForMonth(supabase, new Date());
+  return totals.expenseCadTotal;
 }
 
 export type MonthlyStats = {
@@ -256,14 +347,41 @@ export async function getMonthlyStats(
   const start = new Date(`${fromMonth}-01T12:00:00`);
   const end = new Date(`${toMonth}-01T12:00:00`);
   const months = differenceInMonths(end, start) + 1;
-  const results: MonthlyStats[] = [];
+  const rangeStart = format(start, "yyyy-MM-01");
+  const rangeEnd = format(endOfMonth(end), "yyyy-MM-dd");
+  const [expensesResult, categoriesResult] = await Promise.all([
+    supabase
+      .from("expenses")
+      .select("*")
+      .gte("spent_at", rangeStart)
+      .lte("spent_at", rangeEnd)
+      .order("spent_at", { ascending: false })
+      .order("created_at", { ascending: false }),
+    supabase.from("expense_categories").select("*"),
+  ]);
 
+  if (expensesResult.error) throw new Error(expensesResult.error.message);
+  if (categoriesResult.error) throw new Error(categoriesResult.error.message);
+
+  const expensesByMonth = new Map<string, ExpenseWithRelations[]>();
+  for (const expense of mapExpensesToCategories(expensesResult.data, categoriesResult.data)) {
+    const month = expense.spent_at.slice(0, 7);
+    const existing = expensesByMonth.get(month);
+    if (existing) {
+      existing.push(expense);
+    } else {
+      expensesByMonth.set(month, [expense]);
+    }
+  }
+
+  const results: MonthlyStats[] = [];
   for (let i = 0; i < months; i++) {
     const target = new Date(start.getFullYear(), start.getMonth() + i, 1);
-    const expenses = await getExpensesForMonth(supabase, target);
+    const month = format(target, "yyyy-MM");
+    const expenses = expensesByMonth.get(month) ?? [];
     const summary = summarizeExpenses(expenses);
     results.push({
-      month: format(target, "yyyy-MM"),
+      month,
       label: format(target, "M月"),
       expense: summary.expenseCadTotal,
       income: summary.incomeCadTotal,

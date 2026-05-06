@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { Heart } from "lucide-react";
 import { toggleRecipeCooked, toggleRecipeFavorite } from "@/app/(app)/recipes/actions";
 import { DeleteRecipeButton } from "@/components/recipes/delete-recipe-button";
@@ -14,6 +14,7 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
+  const [optimisticDeleted, setOptimisticDeleted] = useState(false);
   const [optimisticCooked, setOptimisticCooked] = useOptimistic(recipe.is_cooked);
   const [optimisticFavorite, setOptimisticFavorite] = useOptimistic(recipe.is_favorite);
   const [, startTransition] = useTransition();
@@ -37,6 +38,8 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
       await toggleRecipeFavorite(formData);
     });
   }
+
+  if (optimisticDeleted) return null;
 
   return (
     <article className="flex items-center gap-3 rounded-lg border bg-card p-4">
@@ -73,7 +76,12 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         >
           <Heart className={optimisticFavorite ? "size-4 fill-rose-400 text-rose-400" : "size-4 text-muted-foreground"} aria-hidden />
         </button>
-        <DeleteRecipeButton recipeId={recipe.id} title={recipe.title} />
+        <DeleteRecipeButton
+          recipeId={recipe.id}
+          title={recipe.title}
+          onOptimisticDelete={() => setOptimisticDeleted(true)}
+          onDeleteFailed={() => setOptimisticDeleted(false)}
+        />
       </div>
     </article>
   );
