@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
+import { TimezoneSync } from "@/components/timezone-sync";
 import { getProfile } from "@/lib/db/profiles";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,5 +20,10 @@ export default async function ProtectedLayout({ children }: { children: React.Re
     redirect("/setup");
   }
 
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <TimezoneSync />
+      {children}
+    </AppShell>
+  );
 }

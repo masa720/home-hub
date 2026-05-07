@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUtcDate, toDateInputValue } from "@/lib/utils/dates";
+import { toDateInputValue } from "@/lib/utils/dates";
+import { getUserToday } from "@/lib/utils/server-dates";
 import { optionalString, requiredString } from "@/lib/utils/form";
 import type { MealType } from "@/types/database";
 
@@ -24,9 +25,9 @@ function mealType(value: FormDataEntryValue | null): MealType {
   return requiredString(value) === "lunch" ? "lunch" : "dinner";
 }
 
-function revalidateMeals(date?: string | null) {
+async function revalidateMeals(date?: string | null) {
   revalidatePath("/meal-plans");
-  if (!date || date === toDateInputValue(getCurrentUtcDate())) {
+  if (!date || date === toDateInputValue(await getUserToday())) {
     revalidatePath("/");
   }
 }
@@ -46,7 +47,7 @@ export async function createMealPlan(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-  revalidateMeals(date);
+  await revalidateMeals(date);
 }
 
 export async function updateMealPlan(formData: FormData) {
@@ -67,7 +68,7 @@ export async function updateMealPlan(formData: FormData) {
     .eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateMeals(date);
+  await revalidateMeals(date);
 }
 
 export async function deleteMealPlan(formData: FormData) {
@@ -78,5 +79,5 @@ export async function deleteMealPlan(formData: FormData) {
   const { error } = await supabase.from("meal_plans").delete().eq("id", id);
 
   if (error) throw new Error(error.message);
-  revalidateMeals(optionalString(formData.get("date")));
+  await revalidateMeals(optionalString(formData.get("date")));
 }

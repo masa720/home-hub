@@ -22,7 +22,8 @@ import {
   Zap,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
-import { APP_START_MONTH, formatJaDate, getCurrentUtcDate, getMonthRange, toDateInputValue } from "@/lib/utils/dates";
+import { APP_START_MONTH, formatJaDate, getMonthRange, toDateInputValue } from "@/lib/utils/dates";
+import { getUserToday } from "@/lib/utils/server-dates";
 import type { ExpenseSummaryData } from "@/lib/db/expenses";
 
 type ExpenseSummaryProps = {
@@ -64,7 +65,7 @@ function getCategoryIcon(name: string) {
   return categoryIcons[name as keyof typeof categoryIcons] ?? ReceiptText;
 }
 
-export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref }: ExpenseSummaryProps) {
+export async function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref }: ExpenseSummaryProps) {
   const pieSegments =
     summary.categoryTotals.length > 0
       ? summary.categoryTotals
@@ -84,7 +85,7 @@ export function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref 
   const monthStart = formatJaDate(selectedMonth, "M月1日");
   const monthEnd = formatJaDate(getMonthRange(selectedMonth).end, "M月d日");
   const selectedMonthValue = toDateInputValue(selectedMonth).slice(0, 7);
-  const currentMonthValue = toDateInputValue(getCurrentUtcDate()).slice(0, 7);
+  const currentMonthValue = toDateInputValue(await getUserToday()).slice(0, 7);
 
   return (
     <section className="overflow-hidden rounded-lg border bg-card">
