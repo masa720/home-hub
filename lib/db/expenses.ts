@@ -1,6 +1,7 @@
 import "server-only";
 
-import { getCurrentUtcDate, getMonthRange, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
+import { getMonthRange, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
+import { getUserToday } from "@/lib/utils/server-dates";
 import { isIncomeCategoryName } from "@/lib/utils/expense-categories";
 import type { createClient } from "@/lib/supabase/server";
 import type { Expense, ExpenseCategory, RecurringExpense } from "@/types/database";
@@ -327,7 +328,7 @@ export async function getExpenseTotalsForMonth(
 }
 
 export async function getCurrentMonthExpenseCadTotal(supabase: SupabaseServerClient) {
-  const totals = await getExpenseTotalsForMonth(supabase, getCurrentUtcDate());
+  const totals = await getExpenseTotalsForMonth(supabase, await getUserToday());
   return totals.expenseCadTotal;
 }
 

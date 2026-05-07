@@ -7,14 +7,15 @@ import { StatsRangeSelector } from "@/components/expenses/stats-range-selector";
 import { getMonthlyStats } from "@/lib/db/expenses";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils/currency";
-import { APP_START_MONTH, getCurrentUtcDate, toDateInputValue } from "@/lib/utils/dates";
+import { APP_START_MONTH, toDateInputValue } from "@/lib/utils/dates";
+import { getUserToday } from "@/lib/utils/server-dates";
 
 type StatsPageProps = {
   searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 };
 
-function resolveRange(range: string | undefined, from: string | undefined, to: string | undefined) {
-  const now = getCurrentUtcDate();
+async function resolveRange(range: string | undefined, from: string | undefined, to: string | undefined) {
+  const now = await getUserToday();
   const currentMonth = toDateInputValue(now).slice(0, 7);
 
   if (range === "custom" && from && to && from <= to) {
@@ -33,7 +34,7 @@ function resolveRange(range: string | undefined, from: string | undefined, to: s
 
 export default async function ExpenseStatsPage({ searchParams }: StatsPageProps) {
   const params = await searchParams;
-  const { key, from, to } = resolveRange(params.range, params.from, params.to);
+  const { key, from, to } = await resolveRange(params.range, params.from, params.to);
   const supabase = await createClient();
   const stats = await getMonthlyStats(supabase, from, to);
 

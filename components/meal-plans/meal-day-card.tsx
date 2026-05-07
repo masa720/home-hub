@@ -4,11 +4,12 @@ import { MealForm } from "@/components/meal-plans/meal-form";
 import { MealCellModal } from "@/components/meal-plans/meal-cell-modal";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils/cn";
-import { formatJaDate, isToday, toDateInputValue } from "@/lib/utils/dates";
+import { formatJaDate, isSameLocalDay, toDateInputValue } from "@/lib/utils/dates";
 import type { MealPlan, MealType } from "@/types/database";
 
 type MealDayCardProps = {
   date: Date;
+  today: Date;
   plans: MealPlan[];
 };
 
@@ -57,17 +58,17 @@ function getDayColor(date: Date): string | undefined {
   return undefined;
 }
 
-export function MealDayCard({ date, plans }: MealDayCardProps) {
+export function MealDayCard({ date, today, plans }: MealDayCardProps) {
   const dateValue = toDateInputValue(date);
   const lunch = plans.find((plan) => plan.meal_type === "lunch");
   const dinner = plans.find((plan) => plan.meal_type === "dinner");
-  const today = isToday(date);
+  const isCurrentDay = isSameLocalDay(date, today);
   const dayColor = getDayColor(date);
 
   return (
-    <tr className={cn("border-b border-border last:border-b-0", today && "bg-sky-500/15 [&>td]:border-l-sky-500/30")}>
-      <td className={cn("w-20 whitespace-nowrap px-3 py-2 align-top", today && "border-l-2 border-l-sky-400")}>
-        <span className={cn("text-sm font-semibold", today ? "text-primary" : "text-white")}>
+    <tr className={cn("border-b border-border last:border-b-0", isCurrentDay && "bg-sky-500/15 [&>td]:border-l-sky-500/30")}>
+      <td className={cn("w-20 whitespace-nowrap px-3 py-2 align-top", isCurrentDay && "border-l-2 border-l-sky-400")}>
+        <span className={cn("text-sm font-semibold", isCurrentDay ? "text-primary" : "text-white")}>
           {formatJaDate(date, "M/d")}
         </span>
         <span className={cn("ml-0.5 text-xs", dayColor ?? "text-muted-foreground")}>
