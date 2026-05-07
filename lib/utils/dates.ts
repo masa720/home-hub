@@ -76,3 +76,9 @@ export function isToday(value: string | Date) {
   const date = typeof value === "string" ? parseDateInputValue(value) : value;
   return isSameDay(toLocalDateOnly(date), toLocalDateOnly(getCurrentUtcDate()));
 }
+
+export function isSameLocalDay(a: string | Date, b: string | Date) {
+  const dateA = typeof a === "string" ? parseDateInputValue(a) : a;
+  const dateB = typeof b === "string" ? parseDateInputValue(b) : b;
+  return isSameDay(toLocalDateOnly(dateA), toLocalDateOnly(dateB));
+}

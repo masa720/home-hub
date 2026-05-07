@@ -14,14 +14,15 @@ import {
 } from "@/lib/db/expenses";
 import { getProfile } from "@/lib/db/profiles";
 import { createClient } from "@/lib/supabase/server";
-import { APP_START_MONTH, getCurrentUtcDate, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
+import { APP_START_MONTH, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
+import { getUserToday } from "@/lib/utils/server-dates";
 
 type ExpensesPageProps = {
   searchParams: Promise<{ month?: string }>;
 };
 
-function parseMonth(value: string | undefined) {
-  if (!value) return getCurrentUtcDate();
+async function parseMonth(value: string | undefined) {
+  if (!value) return getUserToday();
   if (!/^\d{4}-\d{2}$/.test(value) || value < APP_START_MONTH) notFound();
   return parseMonthInputValue(value);
 }
@@ -36,7 +37,7 @@ function shiftMonth(date: Date, amount: number) {
 
 export default async function ExpensesPage({ searchParams }: ExpensesPageProps) {
   const { month } = await searchParams;
-  const selectedMonth = parseMonth(month);
+  const selectedMonth = await parseMonth(month);
   const supabase = await createClient();
   const {
     data: { user },
