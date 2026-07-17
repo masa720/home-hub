@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { MonthPicker } from "@/components/expenses/month-picker";
 import {
@@ -23,12 +25,12 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/currency";
 import { APP_START_MONTH, formatJaDate, getMonthRange, toDateInputValue } from "@/lib/utils/dates";
-import { getUserToday } from "@/lib/utils/server-dates";
-import type { ExpenseSummaryData } from "@/lib/db/expenses";
+import type { ExpenseSummaryData } from "@/lib/utils/expense-summary";
 
 type ExpenseSummaryProps = {
   summary: ExpenseSummaryData;
   selectedMonth: Date;
+  currentMonthValue: string;
   previousHref: string | null;
   nextHref: string;
 };
@@ -65,7 +67,13 @@ function getCategoryIcon(name: string) {
   return categoryIcons[name as keyof typeof categoryIcons] ?? ReceiptText;
 }
 
-export async function ExpenseSummary({ summary, selectedMonth, previousHref, nextHref }: ExpenseSummaryProps) {
+export function ExpenseSummary({
+  summary,
+  selectedMonth,
+  currentMonthValue,
+  previousHref,
+  nextHref,
+}: ExpenseSummaryProps) {
   const pieSegments =
     summary.categoryTotals.length > 0
       ? summary.categoryTotals
@@ -85,7 +93,6 @@ export async function ExpenseSummary({ summary, selectedMonth, previousHref, nex
   const monthStart = formatJaDate(selectedMonth, "M月1日");
   const monthEnd = formatJaDate(getMonthRange(selectedMonth).end, "M月d日");
   const selectedMonthValue = toDateInputValue(selectedMonth).slice(0, 7);
-  const currentMonthValue = toDateInputValue(await getUserToday()).slice(0, 7);
 
   return (
     <section className="overflow-hidden rounded-lg border bg-card">

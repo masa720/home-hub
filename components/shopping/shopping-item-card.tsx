@@ -13,9 +13,10 @@ import type { Store } from "@/types/database";
 type ShoppingItemCardProps = {
   item: ShoppingItemWithStore;
   stores: Store[];
+  isSaving?: boolean;
 };
 
-export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
+export function ShoppingItemCard({ item, stores, isSaving = false }: ShoppingItemCardProps) {
   const [optimisticDeleted, setOptimisticDeleted] = useState(false);
   const [optimisticChecked, setOptimisticChecked] = useOptimistic(item.is_checked);
   const [, startTransition] = useTransition();
@@ -51,11 +52,12 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
   if (optimisticDeleted) return null;
 
   return (
-    <tr className={cn("border-b border-border last:border-b-0", optimisticChecked && "opacity-50")}>
+    <tr className={cn("border-b border-border last:border-b-0", optimisticChecked && "opacity-50", isSaving && "opacity-70")}>
       <td className="w-10 py-2 pl-3 pr-1 align-middle">
         <button
           type="button"
           onClick={handleToggle}
+          disabled={isSaving}
           aria-label={optimisticChecked ? "未購入に戻す" : "購入済みにする"}
           className={cn(
             "flex size-6 items-center justify-center rounded border-2 text-xs",
@@ -66,17 +68,24 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         </button>
       </td>
       <td className="py-2 align-middle">
-        <ShoppingEditModal
-          title="✏️ 買い物を編集"
-          label={
-            <>
-              <span className={cn("text-sm font-medium text-white", optimisticChecked && "line-through")}>{item.name}</span>
-              {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
-            </>
-          }
-        >
-          <ShoppingItemForm stores={stores} item={item} showCancel />
-        </ShoppingEditModal>
+        {isSaving ? (
+          <>
+            <span className="text-sm font-medium text-white">{item.name}</span>
+            <p className="text-[11px] text-muted-foreground">Saving…</p>
+          </>
+        ) : (
+          <ShoppingEditModal
+            title="✏️ 買い物を編集"
+            label={
+              <>
+                <span className={cn("text-sm font-medium text-white", optimisticChecked && "line-through")}>{item.name}</span>
+                {item.note ? <p className="text-xs text-muted-foreground">{item.note}</p> : null}
+              </>
+            }
+          >
+            <ShoppingItemForm stores={stores} item={item} showCancel />
+          </ShoppingEditModal>
+        )}
       </td>
       <td className="py-2 pr-1 text-right align-middle">
         {item.store ? (
@@ -89,12 +98,14 @@ export function ShoppingItemCard({ item, stores }: ShoppingItemCardProps) {
         ) : null}
       </td>
       <td className="w-8 py-2 pr-2 align-middle">
-        <DeleteShoppingItemButton
-          itemId={item.id}
-          name={item.name}
-          onOptimisticDelete={() => setOptimisticDeleted(true)}
-          onDeleteFailed={() => setOptimisticDeleted(false)}
-        />
+        {isSaving ? null : (
+          <DeleteShoppingItemButton
+            itemId={item.id}
+            name={item.name}
+            onOptimisticDelete={() => setOptimisticDeleted(true)}
+            onDeleteFailed={() => setOptimisticDeleted(false)}
+          />
+        )}
       </td>
     </tr>
   );

@@ -13,6 +13,7 @@ import type { ExpenseCategory } from "@/types/database";
 type ExpenseCardProps = {
   expense: ExpenseWithRelations;
   categories: ExpenseCategory[];
+  isSaving?: boolean;
 };
 
 function badgeStyle(color: string | null) {
@@ -24,14 +25,14 @@ function badgeStyle(color: string | null) {
   };
 }
 
-export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
+export function ExpenseCard({ expense, categories, isSaving = false }: ExpenseCardProps) {
   const [optimisticDeleted, setOptimisticDeleted] = useState(false);
   const isIncome = expense.type === "income";
 
   if (optimisticDeleted) return null;
 
   return (
-    <tr className="border-b border-border last:border-b-0">
+    <tr className={isSaving ? "border-b border-border opacity-70 last:border-b-0" : "border-b border-border last:border-b-0"}>
       <td className="w-[4.5rem] whitespace-nowrap py-2 pl-3 pr-2 align-top">
         <span className="text-xs font-bold text-white">{formatJaDate(expense.spent_at, "M/d")}</span>
         <span className="ml-1 text-[10px] font-semibold text-muted-foreground">{formatJaDate(expense.spent_at, "E")}</span>
@@ -51,6 +52,7 @@ export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
           ) : null}
         </div>
         {expense.memo ? <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{expense.memo}</p> : null}
+        {isSaving ? <p className="mt-1 text-[11px] text-muted-foreground">Saving…</p> : null}
       </td>
       <td className="w-28 py-2 pr-1 text-right align-top">
         <p className={isIncome ? "text-sm font-bold text-sky-400" : "text-sm font-bold text-red-400"}>
@@ -59,7 +61,7 @@ export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
         </p>
       </td>
       <td className="w-16 py-2 pr-2 align-top">
-        <div className="flex justify-end gap-1">
+        {isSaving ? null : <div className="flex justify-end gap-1">
           <ExpenseEditModal
             label={
               <span className="inline-flex size-7 min-h-7 min-w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground">
@@ -78,7 +80,7 @@ export function ExpenseCard({ expense, categories }: ExpenseCardProps) {
             onOptimisticDelete={() => setOptimisticDeleted(true)}
             onDeleteFailed={() => setOptimisticDeleted(false)}
           />
-        </div>
+        </div>}
       </td>
     </tr>
   );

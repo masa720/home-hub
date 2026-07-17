@@ -9,9 +9,10 @@ import type { Store } from "@/types/database";
 
 type ShoppingAddFabProps = {
   stores: Store[];
+  createAction?: (formData: FormData) => Promise<void>;
 };
 
-export function ShoppingAddFab({ stores }: ShoppingAddFabProps) {
+export function ShoppingAddFab({ stores, createAction }: ShoppingAddFabProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   return (
@@ -42,7 +43,7 @@ export function ShoppingAddFab({ stores }: ShoppingAddFabProps) {
           </Button>
         </div>
         <div className="p-3" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
-          <ShoppingItemForm stores={stores} showCancel />
+          <ShoppingItemForm stores={stores} showCancel createAction={createAction} />
           <Link
             href="/settings/stores"
             className="mt-2 inline-flex items-center gap-1 px-1 text-xs text-muted-foreground hover:text-white"

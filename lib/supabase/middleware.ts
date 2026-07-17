@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { AUTHENTICATED_USER_ID_HEADER } from "@/lib/auth/constants";
 import type { Database } from "@/types/database";
 
 type CookieToSet = {
@@ -9,7 +10,7 @@ type CookieToSet = {
 };
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const responseCookies: CookieToSet[] = [];
 
   const supabase = createServerClient<Database, "public", Database["public"]>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,10 +22,7 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
+          responseCookies.push(...cookiesToSet);
         },
       },
     },
@@ -38,18 +36,31 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/auth");
   const isPublicAsset = pathname.startsWith("/_next") || pathname === "/favicon.ico";
 
+  function withAuthCookies(response: NextResponse) {
+    responseCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+    return response;
+  }
+
   if (!user && !isAuthRoute && !isPublicAsset) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirectUrl);
+    return withAuthCookies(NextResponse.redirect(redirectUrl));
   }
 
   if (user && pathname === "/login") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";
-    return NextResponse.redirect(redirectUrl);
+    return withAuthCookies(NextResponse.redirect(redirectUrl));
   }
 
-  return response;
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.delete(AUTHENTICATED_USER_ID_HEADER);
+  if (user) requestHeaders.set(AUTHENTICATED_USER_ID_HEADER, user.id);
+
+  return withAuthCookies(
+    NextResponse.next({
+      request: { headers: requestHeaders },
+    }),
+  );
 }

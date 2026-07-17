@@ -3,6 +3,11 @@ import "server-only";
 import { getMonthRange, parseMonthInputValue, toDateInputValue } from "@/lib/utils/dates";
 import { getUserToday } from "@/lib/utils/server-dates";
 import { isIncomeCategoryName } from "@/lib/utils/expense-categories";
+import {
+  summarizeExpenses,
+  type ExpenseCategoryTotal,
+  type ExpenseSummaryData,
+} from "@/lib/utils/expense-summary";
 import type { createClient } from "@/lib/supabase/server";
 import type { Expense, ExpenseCategory, RecurringExpense } from "@/types/database";
 
@@ -16,20 +21,7 @@ export type RecurringExpenseWithRelations = RecurringExpense & {
   category: ExpenseCategory | null;
 };
 
-export type ExpenseSummaryData = {
-  expenseCadTotal: number;
-  incomeCadTotal: number;
-  netCadTotal: number;
-  categoryTotals: ExpenseCategoryTotal[];
-};
-
-export type ExpenseCategoryTotal = {
-  id: string;
-  name: string;
-  color: string;
-  amountCad: number;
-  percent: number;
-};
+export type { ExpenseCategoryTotal, ExpenseSummaryData } from "@/lib/utils/expense-summary";
 
 function mapExpensesToCategories(expenses: Expense[], categories: ExpenseCategory[]) {
   const categoryById = new Map(categories.map((category) => [category.id, category]));
@@ -77,6 +69,136 @@ export async function getExpensesForMonth(
   return mapExpensesToCategories(expensesResult.data, categoriesResult.data);
 }
 
+type ExpensePageDataOptions = {
+  userId: string;
+  enteredByName: string | Promise<string>;
+};
+
+export async function getExpensePageData(
+  supabase: SupabaseServerClient,
+  baseDate: Date,
+  { userId, enteredByName }: ExpensePageDataOptions,
+) {
+  const monthRange = getMonthRange(baseDate);
+  const start = toDateInputValue(monthRange.start);
+  const end = toDateInputValue(monthRange.end);
+  const month = toDateInputValue(baseDate).slice(0, 7);
+  const lastDay = monthRange.end.getUTCDate();
+
+  const [expensesResult, categoriesResult, recurringResult, resolvedEnteredByName] = await Promise.all([
+    supabase
+      .from("expenses")
+      .select("*")
+      .gte("spent_at", start)
+      .lte("spent_at", end)
+      .order("spent_at", { ascending: false })
+      .order("created_at", { ascending: false }),
+    supabase.from("expense_categories").select("*").order("sort_order").order("name"),
+    supabase
+      .from("recurring_expenses")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_active", true)
+      .lte("start_month", start)
+      .or(`end_month.is.null,end_month.gte.${start}`),
+    Promise.resolve(enteredByName),
+  ]);
+
+  if (expensesResult.error) throw new Error(expensesResult.error.message);
+  if (categoriesResult.error) throw new Error(categoriesResult.error.message);
+  if (recurringResult.error) throw new Error(recurringResult.error.message);
+
+  const categories = categoriesResult.data;
+  const categoryById = new Map(categories.map((category) => [category.id, category]));
+  const existingByRecurringId = new Map(
+    expensesResult.data
+      .filter((expense) => expense.user_id === userId && expense.recurring_expense_id)
+      .map((expense) => [expense.recurring_expense_id as string, expense]),
+  );
+  const toExpensePayload = (recurring: (typeof recurringResult.data)[number]) => {
+    const day = Math.min(recurring.day_of_month, lastDay);
+    const type = isIncomeCategoryName(categoryById.get(recurring.category_id ?? "")?.name)
+      ? ("income" as const)
+      : recurring.type;
+
+    return {
+      user_id: userId,
+      type,
+      amount: recurring.amount,
+      currency: "CAD" as const,
+      exchange_rate_to_cad: 1,
+      category_id: recurring.category_id,
+      recurring_expense_id: recurring.id,
+      entered_by_name: resolvedEnteredByName,
+      memo: recurring.memo ?? recurring.title,
+      spent_at: `${month}-${String(day).padStart(2, "0")}`,
+    };
+  };
+
+  const inserts = recurringResult.data
+    .filter((recurring) => !existingByRecurringId.has(recurring.id))
+    .map(toExpensePayload);
+  const updates = recurringResult.data
+    .map((recurring) => ({
+      existing: existingByRecurringId.get(recurring.id),
+      payload: toExpensePayload(recurring),
+    }))
+    .filter((item): item is { existing: Expense; payload: ReturnType<typeof toExpensePayload> } =>
+      Boolean(item.existing),
+    )
+    .filter(({ existing, payload }) =>
+      existing.type !== payload.type ||
+      Number(existing.amount) !== Number(payload.amount) ||
+      existing.category_id !== payload.category_id ||
+      existing.memo !== payload.memo ||
+      existing.spent_at !== payload.spent_at ||
+      existing.entered_by_name !== payload.entered_by_name,
+    );
+
+  const insertedRowsPromise = inserts.length > 0
+    ? supabase.from("expenses").insert(inserts).select("*")
+    : Promise.resolve({ data: [] as Expense[], error: null });
+  const [insertedResult, updatedRows] = await Promise.all([
+    insertedRowsPromise,
+    Promise.all(
+      updates.map(async ({ existing, payload }) => {
+        const { data, error } = await supabase
+          .from("expenses")
+          .update({
+            type: payload.type,
+            amount: payload.amount,
+            currency: payload.currency,
+            exchange_rate_to_cad: payload.exchange_rate_to_cad,
+            category_id: payload.category_id,
+            entered_by_name: payload.entered_by_name,
+            memo: payload.memo,
+            spent_at: payload.spent_at,
+          })
+          .eq("id", existing.id)
+          .select("*")
+          .single();
+        if (error) throw new Error(error.message);
+        return data;
+      }),
+    ),
+  ]);
+
+  if (insertedResult.error) throw new Error(insertedResult.error.message);
+
+  const updatedById = new Map(updatedRows.map((expense) => [expense.id, expense]));
+  const expenses = [...expensesResult.data.map((expense) => updatedById.get(expense.id) ?? expense), ...insertedResult.data]
+    .toSorted((a, b) => {
+      const dateOrder = b.spent_at.localeCompare(a.spent_at);
+      if (dateOrder !== 0) return dateOrder;
+      return b.created_at.localeCompare(a.created_at);
+    });
+
+  return {
+    categories,
+    expenses: mapExpensesToCategories(expenses, categories),
+  };
+}
+
 export async function getRecurringExpenses(supabase: SupabaseServerClient) {
   const [recurringResult, categoriesResult] = await Promise.all([
     supabase
@@ -121,179 +243,6 @@ export async function getRecurringExpenseSettingsData(supabase: SupabaseServerCl
   })) satisfies RecurringExpenseWithRelations[];
 
   return { categories, recurringExpenses };
-}
-
-type ApplyRecurringExpensesOptions = {
-  userId?: string;
-  enteredByName?: string;
-  categories?: Pick<ExpenseCategory, "id" | "name">[];
-};
-
-export async function applyRecurringExpensesForMonth(
-  supabase: SupabaseServerClient,
-  baseDate: Date,
-  options: ApplyRecurringExpensesOptions = {},
-) {
-  let userId = options.userId;
-  if (!userId) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError || !user) throw new Error("ログインが必要です。");
-    userId = user.id;
-  }
-
-  const monthRange = getMonthRange(baseDate);
-  const start = toDateInputValue(monthRange.start);
-  const end = toDateInputValue(monthRange.end);
-  const lastDay = monthRange.end.getUTCDate();
-  const month = toDateInputValue(baseDate).slice(0, 7);
-  const categoriesPromise = options.categories
-    ? Promise.resolve({ data: options.categories, error: null })
-    : supabase.from("expense_categories").select("id, name");
-  const profilePromise = options.enteredByName
-    ? Promise.resolve({ data: null, error: null })
-    : supabase.from("profiles").select("display_name,email").eq("id", userId).maybeSingle();
-
-  const [recurringResult, existingResult, categoriesResult, profileResult] = await Promise.all([
-    supabase
-      .from("recurring_expenses")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("is_active", true)
-      .lte("start_month", start)
-      .or(`end_month.is.null,end_month.gte.${start}`),
-    supabase
-      .from("expenses")
-      .select("id, recurring_expense_id, type, amount, category_id, memo, spent_at, entered_by_name")
-      .eq("user_id", userId)
-      .gte("spent_at", start)
-      .lte("spent_at", end)
-      .not("recurring_expense_id", "is", null),
-    categoriesPromise,
-    profilePromise,
-  ]);
-
-  if (recurringResult.error) throw new Error(recurringResult.error.message);
-  if (existingResult.error) throw new Error(existingResult.error.message);
-  if (categoriesResult.error) throw new Error(categoriesResult.error.message);
-  if (profileResult.error) throw new Error(profileResult.error.message);
-
-  const categories = new Map(categoriesResult.data.map((category) => [category.id, category]));
-  const enteredByName = options.enteredByName ?? profileResult.data?.display_name ?? profileResult.data?.email?.split("@")[0] ?? "Unknown";
-  const existingByRecurringId = new Map(
-    existingResult.data
-      .filter((expense) => expense.recurring_expense_id)
-      .map((expense) => [expense.recurring_expense_id as string, expense]),
-  );
-  const toExpensePayload = (recurring: (typeof recurringResult.data)[number]) => {
-    const day = Math.min(recurring.day_of_month, lastDay);
-    const type = isIncomeCategoryName(categories.get(recurring.category_id ?? "")?.name) ? "income" : recurring.type;
-    return {
-      user_id: userId,
-      type,
-      amount: recurring.amount,
-      currency: "CAD" as const,
-      exchange_rate_to_cad: 1,
-      category_id: recurring.category_id,
-      recurring_expense_id: recurring.id,
-      entered_by_name: enteredByName,
-      memo: recurring.memo ?? recurring.title,
-      spent_at: `${month}-${String(day).padStart(2, "0")}`,
-    };
-  };
-
-  const inserts = recurringResult.data
-    .filter((recurring) => !existingByRecurringId.has(recurring.id))
-    .map(toExpensePayload);
-
-  const updates = recurringResult.data
-    .map((recurring) => ({ recurring, existing: existingByRecurringId.get(recurring.id) }))
-    .filter((item): item is { recurring: (typeof recurringResult.data)[number]; existing: (typeof existingResult.data)[number] } =>
-      Boolean(item.existing),
-    )
-    .filter(({ recurring, existing }) => {
-      const payload = toExpensePayload(recurring);
-      return (
-        existing.type !== payload.type ||
-        Number(existing.amount) !== Number(payload.amount) ||
-        existing.category_id !== payload.category_id ||
-        existing.memo !== payload.memo ||
-        existing.spent_at !== payload.spent_at ||
-        existing.entered_by_name !== payload.entered_by_name
-      );
-    });
-
-  if (inserts.length > 0) {
-    const { error } = await supabase.from("expenses").insert(inserts);
-    if (error) throw new Error(error.message);
-  }
-
-  await Promise.all(
-    updates.map(async ({ recurring, existing }) => {
-      const payload = toExpensePayload(recurring);
-      const { error } = await supabase
-        .from("expenses")
-        .update({
-          type: payload.type,
-          amount: payload.amount,
-          currency: payload.currency,
-          exchange_rate_to_cad: payload.exchange_rate_to_cad,
-          category_id: payload.category_id,
-          entered_by_name: payload.entered_by_name,
-          memo: payload.memo,
-          spent_at: payload.spent_at,
-        })
-        .eq("id", existing.id);
-      if (error) throw new Error(error.message);
-    }),
-  );
-}
-
-export function summarizeExpenses(expenses: ExpenseWithRelations[]): ExpenseSummaryData {
-  let expenseCadTotal = 0;
-  let incomeCadTotal = 0;
-  const categoryTotals = new Map<string, ExpenseCategoryTotal>();
-
-  for (const expense of expenses) {
-    const amountCad = Number(expense.amount_cad ?? 0);
-
-    const isIncome = expense.type === "income" || isIncomeCategoryName(expense.category?.name);
-
-    if (isIncome) {
-      incomeCadTotal += amountCad;
-    } else {
-      expenseCadTotal += amountCad;
-      const id = expense.category?.id ?? "uncategorized";
-      const existing = categoryTotals.get(id);
-      if (existing) {
-        existing.amountCad += amountCad;
-      } else {
-        categoryTotals.set(id, {
-          id,
-          name: expense.category?.name ?? "未分類",
-          color: expense.category?.color ?? "#94a3b8",
-          amountCad,
-          percent: 0,
-        });
-      }
-    }
-  }
-
-  const categoryTotalItems = Array.from(categoryTotals.values())
-    .map((item) => ({
-      ...item,
-      percent: expenseCadTotal > 0 ? (item.amountCad / expenseCadTotal) * 100 : 0,
-    }))
-    .toSorted((a, b) => b.amountCad - a.amountCad);
-
-  return {
-    expenseCadTotal,
-    incomeCadTotal,
-    netCadTotal: incomeCadTotal - expenseCadTotal,
-    categoryTotals: categoryTotalItems,
-  };
 }
 
 export async function getExpenseTotalsForMonth(
