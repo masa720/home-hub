@@ -1,22 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { requireRequestAuth } from "@/lib/auth/server";
 import { optionalString, requiredString } from "@/lib/utils/form";
 import type { Priority } from "@/types/database";
 
 async function getUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new Error("ログインが必要です。");
-  }
-
-  return { supabase, userId: user.id };
+  return requireRequestAuth();
 }
 
 function revalidateShopping() {

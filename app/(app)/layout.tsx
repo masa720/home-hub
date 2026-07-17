@@ -1,29 +1,33 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { AppLoadingSkeleton } from "@/components/app-loading-skeleton";
 import { AppShell } from "@/components/app-shell";
 import { TimezoneSync } from "@/components/timezone-sync";
-import { getProfile } from "@/lib/db/profiles";
-import { createClient } from "@/lib/supabase/server";
+import { getRequestAuth, getRequestProfile } from "@/lib/auth/server";
 
-export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+async function ProtectedContent({ children }: { children: React.ReactNode }) {
+  const { userId } = await getRequestAuth();
 
-  if (!user) {
+  if (!userId) {
     redirect("/login");
   }
 
-  const profile = await getProfile(supabase, user.id);
+  const profile = await getRequestProfile();
 
   if (!profile.display_name) {
     redirect("/setup");
   }
 
+  return children;
+}
+
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppShell>
       <TimezoneSync />
-      {children}
+      <Suspense fallback={<AppLoadingSkeleton />}>
+        <ProtectedContent>{children}</ProtectedContent>
+      </Suspense>
     </AppShell>
   );
 }

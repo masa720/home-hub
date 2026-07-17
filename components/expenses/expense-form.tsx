@@ -15,6 +15,7 @@ type ExpenseFormProps = {
   expense?: ExpenseWithRelations;
   defaultEnteredByName?: string;
   showCancel?: boolean;
+  createAction?: (formData: FormData) => Promise<void>;
 };
 
 export function ExpenseForm({
@@ -22,8 +23,9 @@ export function ExpenseForm({
   expense,
   defaultEnteredByName = "",
   showCancel = false,
+  createAction,
 }: ExpenseFormProps) {
-  const action = expense ? updateExpense : createExpense;
+  const action = expense ? updateExpense : createAction ?? createExpense;
 
   return (
     <form action={action} className="space-y-3 rounded-lg border bg-card p-4">

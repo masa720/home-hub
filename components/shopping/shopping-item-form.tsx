@@ -13,10 +13,17 @@ type ShoppingItemFormProps = {
   item?: ShoppingItemWithStore;
   compact?: boolean;
   showCancel?: boolean;
+  createAction?: (formData: FormData) => Promise<void>;
 };
 
-export function ShoppingItemForm({ stores, item, compact = false, showCancel = false }: ShoppingItemFormProps) {
-  const action = item ? updateShoppingItem : createShoppingItem;
+export function ShoppingItemForm({
+  stores,
+  item,
+  compact = false,
+  showCancel = false,
+  createAction,
+}: ShoppingItemFormProps) {
+  const action = item ? updateShoppingItem : createAction ?? createShoppingItem;
 
   return (
     <form action={action} className="space-y-3 rounded-lg border bg-card p-4">

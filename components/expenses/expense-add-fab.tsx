@@ -10,9 +10,10 @@ import type { ExpenseCategory } from "@/types/database";
 type ExpenseAddFabProps = {
   categories: ExpenseCategory[];
   defaultEnteredByName: string;
+  createAction?: (formData: FormData) => Promise<void>;
 };
 
-export function ExpenseAddFab({ categories, defaultEnteredByName }: ExpenseAddFabProps) {
+export function ExpenseAddFab({ categories, defaultEnteredByName, createAction }: ExpenseAddFabProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   return (
@@ -41,7 +42,12 @@ export function ExpenseAddFab({ categories, defaultEnteredByName }: ExpenseAddFa
           </Button>
         </div>
         <div className="p-3" onSubmit={() => setTimeout(() => dialogRef.current?.close(), 0)}>
-          <ExpenseForm categories={categories} defaultEnteredByName={defaultEnteredByName} showCancel />
+          <ExpenseForm
+            categories={categories}
+            defaultEnteredByName={defaultEnteredByName}
+            showCancel
+            createAction={createAction}
+          />
           <Link
             href="/settings/categories"
             className="mt-2 inline-flex items-center gap-1 px-1 text-xs text-muted-foreground hover:text-white"

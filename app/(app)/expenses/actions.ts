@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireRequestAuth } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import { parseAmount } from "@/lib/utils/currency";
 import { isIncomeCategoryName } from "@/lib/utils/expense-categories";
@@ -8,17 +9,7 @@ import { optionalString, requiredString } from "@/lib/utils/form";
 import type { ExpenseType } from "@/types/database";
 
 async function getUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new Error("ログインが必要です。");
-  }
-
-  return { supabase, userId: user.id };
+  return requireRequestAuth();
 }
 
 function revalidateExpenses({ settings = false } = {}) {
